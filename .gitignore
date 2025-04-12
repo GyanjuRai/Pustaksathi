@@ -1,0 +1,26 @@
+# ASP.NET Core
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+
+# ASP.NET temporary files
+*.dbmdl
+*.bak
+*.log
+
+# Angular CLI
+node_modules/
+dist/
+coverage/
+.tmp/
+
+# IDE and Editor files
+.idea/
+*.sln.docstates
+
+# OS generated files
+.DS_Store
+Thumbs.db
