@@ -1,9 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pustaksathi.API", "Pustaksathi.API.csproj", "{C79622E3-8E4A-450F-97E3-6D59502A5281}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pustaksathi.Interface", "..\Pustaksathi.Interface\Pustaksathi.Interface.csproj", "{0D5E5804-8061-4803-B5C1-F0AE234B20A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pustaksathi.Model", "..\Pustaksathi.Model\Pustaksathi.Model.csproj", "{776906A6-C342-45AC-9457-8F32ADD20879}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pustaksathi.Services", "..\Pustaksathi.Services\Pustaksathi.Services.csproj", "{F484E7CE-049F-4281-804A-ECE0ADD0F497}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pustaksathi.Data", "..\Pustaksathi.Data\Pustaksathi.Data.csproj", "{81478950-1628-400D-980F-FF280FDEACF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +23,22 @@ Global
 		{C79622E3-8E4A-450F-97E3-6D59502A5281}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C79622E3-8E4A-450F-97E3-6D59502A5281}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C79622E3-8E4A-450F-97E3-6D59502A5281}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D5E5804-8061-4803-B5C1-F0AE234B20A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D5E5804-8061-4803-B5C1-F0AE234B20A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D5E5804-8061-4803-B5C1-F0AE234B20A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D5E5804-8061-4803-B5C1-F0AE234B20A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{776906A6-C342-45AC-9457-8F32ADD20879}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{776906A6-C342-45AC-9457-8F32ADD20879}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{776906A6-C342-45AC-9457-8F32ADD20879}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{776906A6-C342-45AC-9457-8F32ADD20879}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F484E7CE-049F-4281-804A-ECE0ADD0F497}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F484E7CE-049F-4281-804A-ECE0ADD0F497}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F484E7CE-049F-4281-804A-ECE0ADD0F497}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F484E7CE-049F-4281-804A-ECE0ADD0F497}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81478950-1628-400D-980F-FF280FDEACF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81478950-1628-400D-980F-FF280FDEACF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81478950-1628-400D-980F-FF280FDEACF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81478950-1628-400D-980F-FF280FDEACF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

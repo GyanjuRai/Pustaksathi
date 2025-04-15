@@ -6,4 +6,20 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Application\" />
+    <Folder Include="Shared\Account\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Pustaksathi.Data\Pustaksathi.Data.csproj" />
+    <ProjectReference Include="..\Pustaksathi.Interface\Pustaksathi.Interface.csproj" />
+    <ProjectReference Include="..\Pustaksathi.Model\Pustaksathi.Model.csproj" />
+  </ItemGroup>
+
 </Project>
