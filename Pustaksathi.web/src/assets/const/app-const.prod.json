@@ -1,0 +1,8 @@
+{
+    "environment": "Prod",
+    "apiBaseUrl": "",
+    "apiSegment": "",
+    "webUrl": "",
+    "storageKey": "",
+    "secretKey": ""
+}

@@ -1,0 +1,8 @@
+{
+    "enivronment": "Dev",
+    "apiBaseUrl": "http://localhost:5200/",
+    "apiSegment": "api/v1/",
+    "webUrl": "htpp://localhost:4200",
+    "storageKey": "",
+    "secretKey": ""
+}
