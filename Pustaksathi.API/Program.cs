@@ -131,7 +131,8 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services
-    .AppSettingConfig(builder.Configuration);
+    .AppSettingConfig(builder.Configuration)
+    .AddCoreServices();
 
 builder.Services.AddControllers();
 
