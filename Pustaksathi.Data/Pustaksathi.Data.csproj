@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Application\" />
-    <Folder Include="Shared\Account\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4">
       <PrivateAssets>all</PrivateAssets>
@@ -23,8 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pustaksathi.Data\Pustaksathi.Data.csproj" />
-    <ProjectReference Include="..\Pustaksathi.Interface\Pustaksathi.Interface.csproj" />
     <ProjectReference Include="..\Pustaksathi.Model\Pustaksathi.Model.csproj" />
   </ItemGroup>
 
