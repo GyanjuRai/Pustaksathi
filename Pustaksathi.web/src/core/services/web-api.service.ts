@@ -13,7 +13,7 @@ export class WebApiService {
     apiUrl: string;
 
     constructor(private http: HttpClient) {
-        this.apiUrl = `${AppConst?.data?.apirBaseUrl}${AppConst?.data?.apiSegment}`;
+        this.apiUrl = `${AppConst?.data?.apiBaseUrl}`;
     }
 
     get(url: string, param?: object, nestedParam = false, showLoader = false, refresh = true): Observable<any> {
