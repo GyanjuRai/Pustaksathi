@@ -1,5 +1,8 @@
 ﻿
 
+using Pustaksathi.Model.Shared.Attribute;
+using System.ComponentModel.DataAnnotations;
+
 namespace Pustaksathi.Model.Shared.Account
 {
     public record Users
@@ -10,12 +13,14 @@ namespace Pustaksathi.Model.Shared.Account
         public required string PasswordHash { get; set; }
         public required int RoleId { get; set; }
         public DateTime? CreatedAt { get; set; }
+        public DateTime? ModifiedAt { get; set; }
+        public AttributeItem? Role { get; set; }
     }
 
     public record UserLoginParam
     {
         public string? Email { get; set; }
-        public string? Password { get; set; }
+        public string? PasswordHash { get; set; }
     }
 
     public record UserInfoResponse
