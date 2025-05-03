@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Application\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4">
@@ -25,6 +21,10 @@
     <ProjectReference Include="..\Pustaksathi.Data\Pustaksathi.Data.csproj" />
     <ProjectReference Include="..\Pustaksathi.Interface\Pustaksathi.Interface.csproj" />
     <ProjectReference Include="..\Pustaksathi.Model\Pustaksathi.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Application\Notification\" />
   </ItemGroup>
 
 </Project>

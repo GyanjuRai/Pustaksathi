@@ -1,6 +1,7 @@
 ﻿
 
 using Pustaksathi.Model.Shared.Attribute;
+using System.ComponentModel.DataAnnotations;
 
 namespace Pustaksathi.Model.Shared.Account
 {

@@ -1,6 +1,5 @@
 ﻿
 
-using E2_Dynamics.Model.Shared.Enum;
 
 namespace Pustaksathi.Model.Shared.Response
 {

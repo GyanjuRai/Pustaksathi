@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace Pustaksathi.Model.Application.Books
 {
-    public record Books
+    public record BooksDetails
     {
         public required Guid BookId { get; set; } = new Guid();
         public required string Title { get; set; }
@@ -25,7 +21,10 @@ namespace Pustaksathi.Model.Application.Books
         public required int AuthorId { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
+    }
 
+    public record BookFitlerOptionParam
+    {
 
     }
 }

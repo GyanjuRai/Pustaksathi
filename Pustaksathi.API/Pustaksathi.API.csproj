@@ -24,14 +24,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\Application\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Pustaksathi.Data\Pustaksathi.Data.csproj" />
     <ProjectReference Include="..\Pustaksathi.Interface\Pustaksathi.Interface.csproj" />
     <ProjectReference Include="..\Pustaksathi.Model\Pustaksathi.Model.csproj" />
     <ProjectReference Include="..\Pustaksathi.Services\Pustaksathi.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\Application\Notification\" />
   </ItemGroup>
 
 </Project>

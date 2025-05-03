@@ -55,7 +55,8 @@ builder.Host.UseSerilog((ctx, lc) => lc
  */
 //string ENVIRONMENT = builder.Configuration.GetSection("Environment").Value ?? "Dev";
 string CONNECTION_STRING = builder.Configuration[$"ConnectionString"] ?? builder.Configuration["ConnectionString"] ?? "";
-builder.Services.AddDbContext<PustaksathiDbContext>(options => options.UseNpgsql(CONNECTION_STRING));
+builder.Services.AddDbContext<PustaksathiDbContext>(options => options.UseNpgsql(CONNECTION_STRING, sql => sql.MigrationsAssembly("Pustaksathi.Data")));
+
 
 /**
  * ===============================
@@ -132,7 +133,8 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services
     .AppSettingConfig(builder.Configuration)
-    .AddCoreServices();
+    .AddCoreServices()
+    .AddApplicationServices();
 
 builder.Services.AddControllers();
 
