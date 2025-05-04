@@ -28,6 +28,7 @@ namespace Pustaksathi.Data.ApplicationDbContext
         // ============================
         // Attribute Configuration ====
         // ============================
+        #region Attribute configuration
         public void AttributeModelBuilder(ModelBuilder builder)
         {
 
@@ -60,10 +61,12 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 .IsRequired();
             });
         }
+        #endregion
 
         // =============================
         // User Configuration ==========
         // =============================
+        #region User configuration
         public void UserModelBuilder(ModelBuilder builder)
         {
             builder.Entity<Users>()
@@ -74,11 +77,17 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 .WithOne()
                 .HasForeignKey<Users>(u => u.RoleId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Users>()
+                .HasAlternateKey(u => u.Email);
         }
+        #endregion
 
         // =============================
         // Book Configuration ==========
         // =============================
+        #region Book configuration
+
         public void BookModelBuilder(ModelBuilder builder)
         {
             builder.Entity<BooksDetails>()
@@ -88,6 +97,7 @@ namespace Pustaksathi.Data.ApplicationDbContext
             builder.Entity<BooksDetails>()
                 .HasKey(b => b.BookId);
         }
+        #endregion
     }
 
 }

@@ -1,15 +1,18 @@
 ﻿using E2_Dynamics.Model.Shared.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Pustaksathi.API.Controllers.Shared.Auth;
 using Pustaksathi.Interface.Shared.Account;
 using Pustaksathi.Interface.Shared.Auth;
 using Pustaksathi.Model.Shared.Account;
+using Pustaksathi.Model.Shared.Param;
 using Pustaksathi.Model.Shared.Response;
+using Serilog;
 
 namespace Pustaksathi.API.Controllers.Shared.Account
 {
-    public class AccountController: AuthController
+    public class AccountController : AuthController
     {
         private readonly IAccountService _accountService;
         private readonly IAuthService _authService;
@@ -25,36 +28,107 @@ namespace Pustaksathi.API.Controllers.Shared.Account
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Login([FromBody]UserLoginParam json)
+        public async Task<IActionResult> Login([FromBody] UserLoginParam param)
         {
+            Log.Information("================================> GET: Login");
             try
             {
-                LoginResponseModel loginResponse = new LoginResponseModel //Test purpose
+                LoginResponseModel? response = await _accountService.Login(param);
+                if (response == null)
                 {
-                    UserId = Guid.NewGuid(),
-                    FullName = "John Doe",
-                    Email = "example@email.com",
-                    Role = "Admin",
-                    Token = "sample_token",
-                    RefreshToken = "sample_refresh_token"
-                };
-                return Ok(new ResponseModel<LoginResponseModel> 
-                { 
-                    Type = EnumResponse.Success.ToString(), 
-                    Message = "Login Success", 
-                    Data =loginResponse 
+                    return BadRequest(new ResponseModel<object>
+                    {
+                        Type = EnumResponse.Failed.ToString(),
+                        Message = "Invalid login credentials",
+                        Data = null
+                    });
+                }
+
+                return Ok(new ResponseModel<LoginResponseModel>
+                {
+                    Type = EnumResponse.Success.ToString(),
+                    Message = "Login Success",
+                    Data = response
                 });
             }
             catch (Exception)
             {
-
-                return BadRequest(new ResponseModel<object> { 
+                return BadRequest(new ResponseModel<object>
+                {
                     Type = EnumResponse.SomethingWentWrong.ToString(),
-                    Message = "Error", 
+                    Message = "Error",
                     Data = null
                 });
             }
         }
-        
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> UserTsk([FromBody] Users param)
+        {
+            Log.Information("================================> POST: UserTsk");
+            try
+            {
+                Users? response = await _accountService.UserTsk(param);
+                if (response == null)
+                {
+                    return BadRequest(new ResponseModel<object>
+                    {
+                        Type = EnumResponse.Failed.ToString(),
+                        Message = "User not found",
+                        Data = null
+                    });
+                }
+                return Ok(new ResponseModel<Users>
+                {
+                    Type = EnumResponse.Success.ToString(),
+                    Message = "User created sucessfully",
+                    Data = response
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ResponseModel<object>
+                {
+                    Type = EnumResponse.SomethingWentWrong.ToString(),
+                    Message = "Error",
+                    Data = null
+                });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UserInfoSel([FromQuery] UserIdParam param)
+        {
+            Log.Information("================================> GET: UserInfoSel");
+            try
+            {
+                UserInfoResponse? response = await _accountService.GetUserInfo(param);
+                if (response == null)
+                {
+                    return BadRequest(new ResponseModel<object>
+                    {
+                        Type = EnumResponse.Failed.ToString(),
+                        Message = "User not found",
+                        Data = null
+                    });
+                }
+                return Ok(new ResponseModel<UserInfoResponse>
+                {
+                    Type = EnumResponse.Success.ToString(),
+                    Message = "User info fetched successfully",
+                    Data = response
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ResponseModel<object>
+                {
+                    Type = EnumResponse.SomethingWentWrong.ToString(),
+                    Message = "Error",
+                    Data = null
+                });
+            }
+        }
     }
 }
