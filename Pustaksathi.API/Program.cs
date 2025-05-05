@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Pustaksathi.API.Const;
+using Pustaksathi.Services.Shared.Hubs;
 using Pustaksathi.API.Middleware;
 using Pustaksathi.Data.ApplicationDbContext;
 using Pustaksathi.Model.Shared.Auth;
+using Pustaksathi.Model.Shared.Email;
 using Serilog;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
@@ -48,6 +50,12 @@ builder.Host.UseSerilog((ctx, lc) => lc
     .WriteTo.Console()
     .ReadFrom.Configuration(ctx.Configuration));
 
+builder.Services.Configure<EmailOptions>(
+    builder.Configuration.GetSection("Email:GmailSMTP")
+);
+
+builder.Services.AddSignalR();
+
 /**
  * ===============================
  *      Database connection
@@ -89,6 +97,11 @@ builder.Services.AddCors(options =>
         });
 });
 
+/**
+ * ===============================
+ *      Jwt Configuration
+ * ===============================
+ */
 JwtTokenConfig jwtConfig = builder.Configuration.GetSection("Jwt").Get<JwtTokenConfig>() ?? new JwtTokenConfig();
 builder.Services.AddSingleton(jwtConfig);
 
@@ -177,6 +190,12 @@ app.UseCors(AppData.PolicyName);
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    HubEndpointConventionBuilder hubEndpointConventionBuilder = endpoints.MapHub<OrderHub>("/orderhub")
+    .RequireCors(AppData.PolicyName);
+});
 
 app.MapControllers();
 
