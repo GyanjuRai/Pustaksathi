@@ -107,7 +107,7 @@ namespace Pustaksathi.Services.Application.Members
         #endregion
         
         #region WhiteList
-        public async Task<List<WhiteList>?> WhiteListSel(UserIdParam param) // ashim
+        public async Task<List<WhiteList>?> WhiteListSel(UserIdParam param) 
         {
             try
             {
@@ -123,7 +123,7 @@ namespace Pustaksathi.Services.Application.Members
             }
         }
 
-        public async Task<FlagResponse?> WhiteListTsk(WhiteListTskParam param) // ashim
+        public async Task<FlagResponse?> WhiteListTsk(WhiteListTskParam param) 
         {
             try
             {
@@ -170,7 +170,7 @@ namespace Pustaksathi.Services.Application.Members
 
         }
 
-        public async Task<FlagResponse> WhiteListItemDel(WhiteListItemIdParam param) // ashim
+        public async Task<FlagResponse> WhiteListItemDel(WhiteListItemIdParam param) 
         {
             try
             {
