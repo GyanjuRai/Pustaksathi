@@ -119,6 +119,117 @@ namespace Pustaksathi.API.Controllers.Application.Members
         }
         #endregion
 
+        #region WhiteList
+        [HttpGet]
+        public async Task<IActionResult> WhiteListSel([FromQuery]UserIdParam param)
+        {
+            try
+            {
+                Log.Information("============================> GET: WhiteListSel");
+                List<WhiteList>? response = await _membersService.WhiteListSel(param);
+                if(response == null)
+                {
+                    return Ok(new ResponseModel<object> 
+                    { 
+                        Type = EnumResponse.NoRecordFound.ToString(), 
+                        Message = "No WhiteList Found", 
+                        Data = null 
+                    });
+                }
+                return Ok(new ResponseModel<List<WhiteList>>
+                {
+                    Type = EnumResponse.Success.ToString(),
+                    Message = "WhiteList Found",
+                    Data = response
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error("============================> ERROR: ", ex.Message.ToString());
+                return BadRequest(new ResponseModel<object>
+                {
+                    Type = EnumResponse.SomethingWentWrong.ToString(),
+                    Message = "Something went wrong",
+                    Data = null,
+                    Exception = ex
+                });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> WhiteListTsk([FromBody] WhiteListTskParam param)
+        {
+            try
+            {
+                Log.Information("============================> POST: WhiteListTsk");
+
+                FlagResponse? response = await _membersService.WhiteListTsk(param);
+                if (response != null && response.IsSuccess)
+                {
+                    return Ok(new ResponseModel<FlagResponse>
+                    {
+                        Type = EnumResponse.Success.ToString(),
+                        Message = response.Message,
+                        Data = response
+                    });
+                }
+                return Ok(new ResponseModel<object>
+                {
+                    Type = EnumResponse.Failed.ToString(),
+                    Message = "Failed to Insert",
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error("============================> ERROR: ", ex.Message.ToString());
+                return BadRequest(new ResponseModel<object>
+                {
+                    Type = EnumResponse.SomethingWentWrong.ToString(),
+                    Message = "Something went wrong",
+                    Data = null,
+                    Exception = ex
+                });
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> WhiteListItemDel([FromBody] WhiteListItemIdParam param)
+        {
+            try
+            {
+                Log.Information("============================> DELETE: WhiteListItemDel");
+                FlagResponse response = await _membersService.WhiteListItemDel(param);
+                if (!response.IsSuccess)
+                {
+                    return Ok(new ResponseModel<object>
+                    {
+                        Type = EnumResponse.Failed.ToString(),
+                        Message = response.Message,
+                        Data = null
+                    });
+                }
+                return Ok(new ResponseModel<FlagResponse>
+                {
+                    Type = EnumResponse.Success.ToString(),
+                    Message = response.Message,
+                    Data = response
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error("============================> ERROR: ", ex.Message.ToString());
+                return BadRequest(new ResponseModel<object>
+                {
+                    Type = EnumResponse.SomethingWentWrong.ToString(),
+                    Message = "Something went wrong",
+                    Data = null,
+                    Exception = ex
+                });
+            }
+        }
+        #endregion
+
         
     }
 }

@@ -105,6 +105,103 @@ namespace Pustaksathi.Services.Application.Members
             }
         }
         #endregion
+        
+        #region WhiteList
+        public async Task<List<WhiteList>?> WhiteListSel(UserIdParam param) // ashim
+        {
+            try
+            {
+                List<WhiteList>? response = await _context.WhiteLists
+                    .Where(w => w.UserId == param.UserId)
+                    .Include(w => w.WhiteListItems)
+                    .ToListAsync();
+                return response != null && response.Count > 0 ? response : null;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<FlagResponse?> WhiteListTsk(WhiteListTskParam param) // ashim
+        {
+            try
+            {
+                WhiteList? whiteList = await _context.WhiteLists
+                .FirstOrDefaultAsync(w => w.UserId == param.UserId);
+
+                if (whiteList == null)
+                {
+                    whiteList = new WhiteList
+                    {
+                        WhiteListId = new Guid(),
+                        UserId = param.UserId,
+                        AddedAt = DateTime.UtcNow
+                    };
+                    await _context.WhiteLists.AddAsync(whiteList);
+                    await _context.SaveChangesAsync();
+                }
+
+                foreach (var item in param.WhiteListItems)
+                {
+                    WhiteListItems whiteListItems = new WhiteListItems
+                    {
+                        WhiteListItemId = Guid.NewGuid(),
+                        BookId = item.BookId,
+                        WhiteListId = whiteList.WhiteListId,
+                        AddedAt = DateTime.UtcNow
+                    };
+                    await _context.WhiteListItems.AddAsync(whiteListItems);
+                }
+
+                int result = await _context.SaveChangesAsync();
+
+                return result > 0 ? new FlagResponse
+                {
+                    IsSuccess = true,
+                    Message = "WhiteList Added"
+                } : null;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
+        public async Task<FlagResponse> WhiteListItemDel(WhiteListItemIdParam param) // ashim
+        {
+            try
+            {
+                int result = await _context.WhiteListItems
+                    .Where(w => w.WhiteListItemId == param.WhiteListId)
+                    .ExecuteDeleteAsync();
+
+                if (result == 0)
+                {
+                    return new FlagResponse
+                    {
+                        IsSuccess = false,
+                        Message = "WhiteList Item not found"
+                    };
+                }
+                return new FlagResponse
+                {
+                    IsSuccess = true,
+                    Message = "WhiteList Item deleted successfully"
+                };
+            }
+            catch (Exception)
+            {
+                return new FlagResponse
+                {
+                    IsSuccess = false,
+                    Message = "WhiteList Item deletion failed"
+                };
+            }
+        }
+        #endregion
 
         // ============================
         // Helper functions   =========
@@ -151,5 +248,5 @@ namespace Pustaksathi.Services.Application.Members
         }
         #endregion
 
-            }
+    }
 }

@@ -1,4 +1,7 @@
 ﻿
+using Pustaksathi.Model.Application.Books;
+using Pustaksathi.Model.Shared.Account;
+
 namespace Pustaksathi.Model.Application.Members
 {
 #region Members Orders
@@ -28,4 +31,25 @@ namespace Pustaksathi.Model.Application.Members
       public decimal UnitPrice { get; set; }
   }
   #endregion
+
+  #region WhiteList
+    public record WhiteList
+    {
+        public Guid WhiteListId { get; set; }
+        public Guid UserId { get; set; }
+        public DateTime? AddedAt { get; set; }
+        public Users? users { get; set; }
+        public IReadOnlyCollection<WhiteListItems> WhiteListItems { get; set; } = new List<WhiteListItems>();
+    }
+
+    public record WhiteListItems
+    {
+        public Guid WhiteListItemId { get; set; }
+        public Guid WhiteListId { get; set; }
+        public Guid BookId { get; set; }
+        public DateTime? AddedAt { get; set; }
+        public BooksDetails? books { get; set; }
+        public WhiteList? WhiteList { get; set; }
+    }
+    #endregion
 }
