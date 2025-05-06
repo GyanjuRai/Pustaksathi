@@ -2,6 +2,7 @@
 
 using Pustaksathi.Model.Application.Members;
 using Pustaksathi.Model.Shared.Param;
+using Pustaksathi.Model.Shared.Response;
 
 namespace Pustaksathi.Interface.Application.Members
 {
@@ -23,6 +24,24 @@ namespace Pustaksathi.Interface.Application.Members
         /// </summary>
         /// <returns></returns>
         public Task<FlagResponse> CancelOrder(OrderIdParam param); 
+        #endregion
+
+        #region WhiteList
+        /// <summary>
+        /// Get WhiteList By UserId
+        /// </summary>
+        /// <returns></returns>
+        public Task<List<WhiteList>?> WhiteListSel(UserIdParam param); 
+        /// <summary>
+        /// Insert WhiteList and WhiteListItems
+        /// </summary>
+        /// <returns></returns>
+        public Task<FlagResponse?> WhiteListTsk(WhiteListTskParam param); 
+        /// <summary>
+        /// Delete the WhiteList Item
+        /// </summary>
+        /// <returns></returns>
+        public Task<FlagResponse> WhiteListItemDel(WhiteListItemIdParam param); 
         #endregion
     }
 }
