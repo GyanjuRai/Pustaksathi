@@ -16,6 +16,9 @@ namespace Pustaksathi.API.Controllers.Application.Members
         public MemberController(
             IMembersService context
         )
+        {
+            _membersService = context;
+        }
 
 
         #region Members Orders
@@ -341,6 +344,5 @@ namespace Pustaksathi.API.Controllers.Application.Members
             }
         }
         #endregion
-
     }
 }
