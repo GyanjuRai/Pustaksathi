@@ -12,6 +12,7 @@ using Serilog;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text;
+using Pustaksathi.Model.Shared.Account;
 
 
 /**  
@@ -124,7 +125,7 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig?.Secret ?? "")),
-        ClockSkew = TimeSpan.FromMinutes(jwtConfig?.AccessTokenClockSkewMin ?? 5)
+        ClockSkew = TimeSpan.FromMinutes(jwtConfig?.AccessTokenClockSkewMin ?? 120)
     };
 
     options.Events = new JwtBearerEvents

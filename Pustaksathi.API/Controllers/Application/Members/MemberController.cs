@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Pustaksathi.API.Controllers.Shared.Auth;
 using Pustaksathi.Interface.Application.Members;
-using Pustaksathi.Interface.Shared.Email;
 using Pustaksathi.Model.Application.Members;
 using Pustaksathi.Model.Shared.Param;
 using Pustaksathi.Model.Shared.Response;
@@ -207,6 +206,116 @@ namespace Pustaksathi.API.Controllers.Application.Members
             {
                 Log.Information("============================> DELETE: WhiteListItemDel");
                 FlagResponse response = await _membersService.WhiteListItemDel(param);
+                if (!response.IsSuccess)
+                {
+                    return Ok(new ResponseModel<object>
+                    {
+                        Type = EnumResponse.Failed.ToString(),
+                        Message = response.Message,
+                        Data = null
+                    });
+                }
+                return Ok(new ResponseModel<FlagResponse>
+                {
+                    Type = EnumResponse.Success.ToString(),
+                    Message = response.Message,
+                    Data = response
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error("============================> ERROR: ", ex.Message.ToString());
+                return BadRequest(new ResponseModel<object>
+                {
+                    Type = EnumResponse.SomethingWentWrong.ToString(),
+                    Message = "Something went wrong",
+                    Data = null,
+                    Exception = ex
+                });
+            }
+        }
+        #endregion
+
+        #region Cart
+        [HttpGet]
+        public async Task<IActionResult> CartSel([FromQuery] UserIdParam param)
+        {
+            try
+            {
+                Log.Information("============================> GET: CartSel");
+                List<Cart>? response = await _membersService.CartSel(param);
+                if (response == null)
+                {
+                    return Ok(new ResponseModel<object>
+                    {
+                        Type = EnumResponse.NoRecordFound.ToString(),
+                        Message = "No Cart Found",
+                        Data = null
+                    });
+                }
+                return Ok(new ResponseModel<List<Cart>>
+                {
+                    Type = EnumResponse.Success.ToString(),
+                    Message = "Cart Found",
+                    Data = response
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error("============================> ERROR: ", ex.Message.ToString());
+                return BadRequest(new ResponseModel<object>
+                {
+                    Type = EnumResponse.SomethingWentWrong.ToString(),
+                    Message = "Something went wrong",
+                    Data = null,
+                    Exception = ex
+                });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CartTsk([FromBody] CartTskParam param)
+        {
+            try
+            {
+                Log.Information("============================> POST: CartTsk");
+                FlagResponse? response = await _membersService.CartTsk(param);
+                if (response != null && response.IsSuccess)
+                {
+                    return Ok(new ResponseModel<FlagResponse>
+                    {
+                        Type = EnumResponse.Success.ToString(),
+                        Message = response.Message,
+                        Data = response
+                    });
+                }
+                return Ok(new ResponseModel<object>
+                {
+                    Type = EnumResponse.Failed.ToString(),
+                    Message = "Failed to Insert",
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error("============================> ERROR: ", ex.Message.ToString());
+                return BadRequest(new ResponseModel<object>
+                {
+                    Type = EnumResponse.SomethingWentWrong.ToString(),
+                    Message = "Something went wrong",
+                    Data = null,
+                    Exception = ex
+                });
+            }
+        }
+
+        [HttpDelete]
+        public  async Task<IActionResult> CartItemDel(CartItemsIdParam param)
+        {
+            try
+            {
+                Log.Information("============================> DELETE: CartItemDel");
+                FlagResponse response = await _membersService.CartItemDel(param);
                 if (!response.IsSuccess)
                 {
                     return Ok(new ResponseModel<object>

@@ -21,7 +21,7 @@ namespace Pustaksathi.Interface.Application.Books
         /// Insert or update book
         /// </summary>
         /// <returns></returns>
-        public Task<BooksDetails?> BooksTsk(BooksDetails param);
+        public Task<FlagResponse?> BooksTsk(List<BooksDetails> param);
         /// <summary>
         /// Delete Book
         /// </summary>
