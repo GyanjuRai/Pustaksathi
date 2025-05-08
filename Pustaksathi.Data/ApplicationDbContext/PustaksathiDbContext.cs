@@ -2,6 +2,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Pustaksathi.Model.Application.Books;
+using Pustaksathi.Model.Application.Members;
 using Pustaksathi.Model.Shared.Account;
 using Pustaksathi.Model.Shared.Attribute;
 
@@ -14,15 +15,22 @@ namespace Pustaksathi.Data.ApplicationDbContext
         }
 
         public DbSet<Users> Users { get; set; }
-        public DbSet<BooksDetails> Books { get; set; }
         public DbSet<AttributeItem> AttributeItems { get; set; }
         public DbSet<AttributeCategory> AttributeCategories { get; set; }
+        public DbSet<BooksDetails> Books { get; set; }
+        public DbSet<Orders> Orders { get; set; }
+        public DbSet<OrderItems> OrderItems { get; set; }
+        public DbSet<WhiteList> WhiteLists { get; set; }
+        public DbSet<WhiteListItems> WhiteListItems { get; set; }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartItems> CartItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             AttributeModelBuilder(modelBuilder);
             UserModelBuilder(modelBuilder);
             BookModelBuilder(modelBuilder);
+            OrderModelBuilder(modelBuilder);
         }
 
         // ============================
@@ -69,17 +77,19 @@ namespace Pustaksathi.Data.ApplicationDbContext
         #region User configuration
         public void UserModelBuilder(ModelBuilder builder)
         {
-            builder.Entity<Users>()
-                    .HasKey(u => u.UserId);
+            builder.Entity<Users>(
+                tb =>
+                {
+                    tb.HasKey(u => u.UserId);
 
-            builder.Entity<Users>()
-                .HasOne(u => u.Role)
-                .WithOne()
-                .HasForeignKey<Users>(u => u.RoleId)
-                .OnDelete(DeleteBehavior.Cascade);
+                    tb.HasOne(u => u.Role)
+                    .WithOne()
+                    .HasForeignKey<Users>(u => u.RoleId)
+                    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<Users>()
-                .HasAlternateKey(u => u.Email);
+                    tb.HasAlternateKey(u => u.Email);
+
+                });    
         }
         #endregion
 
@@ -90,12 +100,98 @@ namespace Pustaksathi.Data.ApplicationDbContext
 
         public void BookModelBuilder(ModelBuilder builder)
         {
-            builder.Entity<BooksDetails>()
-                    .HasIndex(b => b.ISBN)
+            builder.Entity<BooksDetails>(
+                tb =>
+                {
+                    tb.HasIndex(b => b.ISBN)
                     .IsUnique();
+                });
 
-            builder.Entity<BooksDetails>()
-                .HasKey(b => b.BookId);
+            builder.Entity<BooksDetails>(
+                tb =>
+                {
+                    tb.HasKey(b => b.BookId);
+                });
+        }
+        #endregion
+
+        // =============================
+        // Order Configuration =========
+        // =============================
+        #region Order configuration
+        public void OrderModelBuilder(ModelBuilder builder)
+        {
+            builder.Entity<Orders>(
+                tb =>
+                {
+                    tb.HasKey(o => o.OrderId);
+
+                    tb.Property(tb => tb.Status)
+                    .HasMaxLength(50)
+                    .IsRequired();
+                    tb.Property(tb => tb.ClaimCode)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                    tb.HasMany(o => o.OrderItems)
+                    .WithOne()
+                    .HasForeignKey(oi => oi.OrderId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                    tb.HasQueryFilter(tb => !tb.IsCancelled);
+                });
+
+            builder.Entity<OrderItems>(
+                tb =>
+                {
+                    tb.HasKey(tb => tb.OrderItemId);
+                });
+        }
+        #endregion
+
+        // ============================
+        // Cart Configuration =========
+        // ============================
+        #region Cart configuration
+        public void CartModelBuilder(ModelBuilder builder)
+        {
+            builder.Entity<Cart>(
+                tb =>
+                {
+                    tb.HasKey(tb => tb.CartId);
+                    tb.HasMany(tb => tb.CartItems)
+                    .WithOne()
+                    .HasForeignKey(tb => tb.CartId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                });
+            builder.Entity<CartItems>(
+                tb =>
+                {
+                    tb.HasKey(tb => tb.CartItemId);
+                });
+        }
+        #endregion
+
+        // ============================
+        // WhiteList Configuration ====
+        // ============================
+        #region WhiteList configuration
+        public void WhiteListModelBuilder(ModelBuilder builder)
+        {
+            builder.Entity<WhiteList>(
+                tb =>
+                {
+                    tb.HasKey(tb => tb.WhiteListId);
+                    tb.HasMany(tb => tb.WhiteListItems)
+                    .WithOne()
+                    .HasForeignKey(tb => tb.WhiteListId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                });
+            builder.Entity<WhiteListItems>(
+                tb =>
+                {
+                    tb.HasKey(tb => tb.WhiteListItemId);
+                });
         }
         #endregion
     }

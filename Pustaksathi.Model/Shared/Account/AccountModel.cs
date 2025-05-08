@@ -11,6 +11,7 @@ namespace Pustaksathi.Model.Shared.Account
         public required string Email { get; set; }
         public required string PasswordHash { get; set; }
         public required int RoleId { get; set; }
+        public bool? IsDiscountApplied { get; set; } = false;
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
         public AttributeItem? Role { get; set; }

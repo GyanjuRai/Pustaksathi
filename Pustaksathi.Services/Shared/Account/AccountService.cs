@@ -30,16 +30,17 @@ namespace Pustaksathi.Services.Shared.Account
         {
             try
             {
-                Users? response = await _context.Users.FirstOrDefaultAsync(x => x.Email == param.Email && x.PasswordHash == param.PasswordHash);
+                Users? response = await _context.Users.FirstAsync(x => x.Email == param.Email && x.PasswordHash == param.PasswordHash);
                 if (response != null)
                 {
                     var claims = new List<Claim>
-                {
-                    new Claim(JwtRegisteredClaimNames.Sub, response.UserId.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Email, response.Email),
-                    new Claim("FullName", response.FullName),
-                    new Claim("Role", response.RoleId.ToString() ?? "")
-                };
+                    {
+                        new Claim(JwtRegisteredClaimNames.Sub, response.UserId.ToString()),
+                        new Claim(JwtRegisteredClaimNames.Email, response.Email),
+                        new Claim("FullName", response.FullName),
+                        new Claim("Role", response.RoleId.ToString() ?? "")
+                    };
+
                     JwtAuthResult jwtAuthResult = await _authService.GenerateToken(claims.ToArray());
                     return new LoginResponseModel
                     {

@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 export class OrderSignalRService {
     private readonly hub = 'orderhub';
     private connection: signalR.HubConnection | null = null;
-    private readonly hubUrl = `${AppConst?.data?.apiBaseUrl}${this.hub}` || 'https://localhost:5001/orderhub';
+    private readonly hubUrl = `${AppConst?.data?.apiBaseUrl}${this.hub}` || 'https://localhost:5200/orderhub';
 
     constructor() {
         this.startConnection();
