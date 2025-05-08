@@ -133,7 +133,7 @@ namespace Pustaksathi.Services.Application.Members
             }
         }
         #endregion
-
+        
         #region WhiteList
         public async Task<List<WhiteList>?> WhiteListSel(UserIdParam param) 
         {
@@ -336,6 +336,7 @@ namespace Pustaksathi.Services.Application.Members
             {
                 await _context.Users.Where(u => u.UserId == UserId)
                     .ExecuteUpdateAsync(u => u.SetProperty(o => o.IsDiscountApplied, true));
+
                 return true;
             }
             return false;
@@ -368,7 +369,7 @@ namespace Pustaksathi.Services.Application.Members
             string claimCode = code.Substring(0, 7);
             return claimCode;
         }
-
+        
         public async Task<CartItems?> CartItemTsk(CartItems cartItems)
         {
             cartItems.CartItemId = Guid.NewGuid();

@@ -12,13 +12,11 @@ namespace Pustaksathi.API.Controllers.Application.Members
     public class MemberController: AuthController
     {
         private readonly IMembersService _membersService;
-
+        
         public MemberController(
             IMembersService context
         )
-        {
-            _membersService = context;
-        }
+
 
         #region Members Orders
         [HttpGet]
@@ -54,7 +52,6 @@ namespace Pustaksathi.API.Controllers.Application.Members
             }
         }
 
-
         [HttpPost]
         public async Task<IActionResult>  OrderTsk([FromBody] Orders param)
         {
@@ -71,7 +68,6 @@ namespace Pustaksathi.API.Controllers.Application.Members
                         Data = null
                     });
                 }
-
                 return Ok(new ResponseModel<Orders>
                 {
                     Type = EnumResponse.Success.ToString(),

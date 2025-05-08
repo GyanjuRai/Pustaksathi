@@ -4,6 +4,7 @@ using Pustaksathi.Model.Shared.Account;
 
 namespace Pustaksathi.Model.Application.Members
 {
+
     #region Members Orders
     public record Orders
     {
@@ -54,7 +55,6 @@ namespace Pustaksathi.Model.Application.Members
     #endregion
 
     #region Cart
-
     public record Cart
     {
         public Guid CartId { get; set; }
