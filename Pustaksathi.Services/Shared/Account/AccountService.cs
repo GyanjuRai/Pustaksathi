@@ -10,6 +10,7 @@ using System.Security.Claims;
 using Pustaksathi.Model.Shared.Auth;
 using System.IdentityModel.Tokens.Jwt;
 using Pustaksathi.Model.Shared.Param;
+using Pustaksathi.Services.Helper;
 
 namespace Pustaksathi.Services.Shared.Account
 {
@@ -30,27 +31,42 @@ namespace Pustaksathi.Services.Shared.Account
         {
             try
             {
-                Users? response = await _context.Users.FirstAsync(x => x.Email == param.Email && x.PasswordHash == param.PasswordHash);
+                Users? response = await _context.Users.FirstAsync(x => x.Email == param.Email);
                 if (response != null)
                 {
-                    var claims = new List<Claim>
+                    if (EncrypDecrypHelper.VerifyPassword(param.PasswordHash, response.PasswordHash))
                     {
-                        new Claim(JwtRegisteredClaimNames.Sub, response.UserId.ToString()),
-                        new Claim(JwtRegisteredClaimNames.Email, response.Email),
-                        new Claim("FullName", response.FullName),
-                        new Claim("Role", response.RoleId.ToString() ?? "")
-                    };
+                        var claims = new List<Claim>
+                        {
+                            new Claim(JwtRegisteredClaimNames.Sub, response.UserId.ToString()),
+                            new Claim(JwtRegisteredClaimNames.Email, response.Email),
+                            new Claim("FullName", response.FullName),
+                            new Claim(ClaimTypes.Role, response.RoleId.ToString() ?? "")
+                        };
 
-                    JwtAuthResult jwtAuthResult = await _authService.GenerateToken(claims.ToArray());
-                    return new LoginResponseModel
+                        JwtAuthResult jwtAuthResult = await _authService.GenerateToken(claims.ToArray());
+                        return new LoginResponseModel
+                        {
+                            UserId = response.UserId,
+                            FullName = response.FullName,
+                            Email = response.Email,
+                            Role = response.RoleId.ToString(),
+                            Token = jwtAuthResult.Token ?? "",
+                            RefreshToken = jwtAuthResult.RefreshToken ?? ""
+                        };
+                    }
+                    else
                     {
-                        UserId = response.UserId,
-                        FullName = response.FullName,
-                        Email = response.Email,
-                        Role = response.RoleId.ToString(),
-                        Token = jwtAuthResult.Token ?? "",
-                        RefreshToken = jwtAuthResult.RefreshToken ?? ""
-                    };
+                        return new LoginResponseModel
+                        {
+                            UserId = Guid.Empty,
+                            FullName = "",
+                            Email = "",
+                            Role = "",
+                            Token = "",
+                            RefreshToken = ""
+                        };
+                    }
                 }
                 else
                 {
@@ -111,6 +127,7 @@ namespace Pustaksathi.Services.Shared.Account
         #region Helper functions
         public async Task<Users?> CreateUser(Users param)
         {
+            param.PasswordHash = param.PasswordHash == null ? "" : EncrypDecrypHelper.Encrypt(param.PasswordHash);
             var existingUser = await _context.Users.FindAsync(param.Email);
             if (existingUser != null)
             {
@@ -135,7 +152,7 @@ namespace Pustaksathi.Services.Shared.Account
 
             existingUser.FullName = param.FullName;
             existingUser.Email = param.Email;
-            existingUser.PasswordHash = param.PasswordHash;
+            existingUser.PasswordHash = param.PasswordHash == null ? "" : EncrypDecrypHelper.Encrypt(param.PasswordHash);
             existingUser.ModifiedAt = DateTime.UtcNow;
             int result = await _context.SaveChangesAsync();
             return result > 0 ? existingUser : null;
