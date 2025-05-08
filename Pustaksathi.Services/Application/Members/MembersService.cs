@@ -6,7 +6,6 @@ using Pustaksathi.Data.ApplicationDbContext;
 using Pustaksathi.Interface.Application.Members;
 using Pustaksathi.Interface.Shared.Email;
 using Pustaksathi.Model.Application.Members;
-using Pustaksathi.Model.Shared.Account;
 using Pustaksathi.Model.Shared.Param;
 using Pustaksathi.Model.Shared.Response;
 using Pustaksathi.Services.Shared.Hubs;
