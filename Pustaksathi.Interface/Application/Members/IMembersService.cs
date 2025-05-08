@@ -40,7 +40,6 @@ namespace Pustaksathi.Interface.Application.Members
         /// <summary>
         /// Delete the WhiteList Item
         /// </summary>
-        /// <param name="param"></param>
         /// <returns></returns>
         public Task<FlagResponse> WhiteListItemDel(WhiteListItemIdParam param); 
         #endregion
