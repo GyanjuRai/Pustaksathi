@@ -43,5 +43,23 @@ namespace Pustaksathi.Interface.Application.Members
         /// <returns></returns>
         public Task<FlagResponse> WhiteListItemDel(WhiteListItemIdParam param); 
         #endregion
+
+        #region Cart
+        /// <summary>
+        /// Get Cart By UserId
+        /// </summary>
+        /// <returns></returns>
+        public Task<List<Cart>?> CartSel(UserIdParam param); 
+        /// <summary>
+        /// Insert or update the Cart
+        /// </summary>
+        /// <returns></returns>
+        public Task<FlagResponse?> CartTsk(CartTskParam param); 
+        /// <summary>
+        /// Delete the Cart Item
+        /// </summary>
+        /// <returns></returns>
+        public Task<FlagResponse> CartItemDel(CartItemsIdParam param);
+        #endregion
     }
 }

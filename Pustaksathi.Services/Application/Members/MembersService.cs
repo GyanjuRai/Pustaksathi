@@ -1,18 +1,31 @@
 ﻿
 
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Pustaksathi.Data.ApplicationDbContext;
 using Pustaksathi.Interface.Application.Members;
+using Pustaksathi.Interface.Shared.Email;
 using Pustaksathi.Model.Application.Members;
 using Pustaksathi.Model.Shared.Param;
+using Pustaksathi.Model.Shared.Response;
+using Pustaksathi.Services.Shared.Hubs;
 
 namespace Pustaksathi.Services.Application.Members
 {
     public class MembersService: IMembersService
     {
         private readonly PustaksathiDbContext _context;
-        public MembersService(PustaksathiDbContext context)
+        private readonly IHubContext<OrderHub> _hub;
+        private readonly IEmailService _emailService;
+        public MembersService(
+            PustaksathiDbContext context,
+            IHubContext<OrderHub> hub,
+            IEmailService email
+            )
         {
             _context = context;
+            _hub = hub;
+            _emailService = email;
         }
 
         #region Members Orders
@@ -59,10 +72,25 @@ namespace Pustaksathi.Services.Application.Members
                 if (param.OrderId == Guid.Empty)
                 {
                     response = await CreateOrder(param);
+
+                    if(response != null)
+                    {
+                        var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == param.UserId);
+                        if (user != null)
+                        {
+                            await _emailService.SendOrderConfirmationAsync(param, user.FullName, user.Email);
+                        }
+                    }
                 }
                 else
                 {
                     response = await UpdateOrder(param);
+                    string message = $"Order {param.OrderId.ToString().Substring(0, 6)} has been completed and received successfully!.";
+
+                    if (response != null)
+                    {
+                        await _hub.Clients.All.SendAsync("ReceiveMessage", message);
+                    }
                 }
 
                 return response;
@@ -203,6 +231,100 @@ namespace Pustaksathi.Services.Application.Members
         }
         #endregion
 
+        #region Cart
+        public async Task<List<Cart>?> CartSel(UserIdParam param) 
+        {
+            try
+            {
+                List<Cart>? response = await _context.Carts
+                    .Where(c => c.UserId == param.UserId)
+                    .Include(c => c.CartItems)
+                    .ToListAsync();
+                return response != null && response.Count > 0 ? response : null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<FlagResponse?> CartTsk(CartTskParam param)
+        {
+            try
+            {
+                CartItems? response;
+                if (param.CartItems.CartId == null)
+                {
+                    Cart cart = new Cart
+                    {
+                        CartId = Guid.NewGuid(),
+                        UserId = param.UserId,
+                        CreatedAt = DateTime.UtcNow,
+                        ModifiedAt = DateTime.UtcNow
+                    };
+                    await _context.Carts.AddAsync(cart);
+                    param.CartItems.CartId = cart.CartId;
+                    await _context.SaveChangesAsync();
+                    
+                }
+
+                if(param.CartItems.CartId == Guid.Empty)
+                {
+                   response = await CartItemTsk(param.CartItems);
+                    return response != null ? new FlagResponse
+                    {
+                        IsSuccess = true,
+                        Message = "Cart Added"
+                    } : null;
+                }
+                else
+                {
+                    response = await CartItemUpdate(param.CartItems);
+                    return response != null ? new FlagResponse
+                    {
+                        IsSuccess = true,
+                        Message = "Cart Updated"
+                    } : null;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<FlagResponse> CartItemDel(CartItemsIdParam param)
+        {
+            try
+            {
+                int result = await _context.CartItems
+                    .Where(c => c.CartItemId == param.CartId)
+                    .ExecuteDeleteAsync();
+                if (result == 0)
+                {
+                    return new FlagResponse
+                    {
+                        IsSuccess = false,
+                        Message = "Cart Item not found"
+                    };
+                }
+                return new FlagResponse
+                {
+                    IsSuccess = true,
+                    Message = "Cart Item deleted successfully"
+                };
+            }
+            catch (Exception)
+            {
+                return new FlagResponse
+                {
+                    IsSuccess = false,
+                    Message = "Cart Item deletion failed"
+                };
+            }
+        }
+        #endregion
+
         // ============================
         // Helper functions   =========
         // ============================
@@ -212,8 +334,9 @@ namespace Pustaksathi.Services.Application.Members
             int result = await _context.Orders.CountAsync(o => o.UserId == UserId);
             if (result >= 0)
             {
-                await _context.Orders.Where(u => u.UserId == UserId)
-                    .ExecuteUpdateAsync(u => u.SetProperty(o => o.LoyalityDiscount, true));
+                await _context.Users.Where(u => u.UserId == UserId)
+                    .ExecuteUpdateAsync(u => u.SetProperty(o => o.IsDiscountApplied, true));
+
                 return true;
             }
             return false;
@@ -246,7 +369,27 @@ namespace Pustaksathi.Services.Application.Members
             string claimCode = code.Substring(0, 7);
             return claimCode;
         }
-        #endregion
+        
+        public async Task<CartItems?> CartItemTsk(CartItems cartItems)
+        {
+            cartItems.CartItemId = Guid.NewGuid();
+            cartItems.CreatedAt = DateTime.UtcNow;
+            cartItems.ModifiedAt = DateTime.UtcNow;
+            await _context.CartItems.AddAsync(cartItems);
+            int result = await _context.SaveChangesAsync();
+            return result > 0 ? cartItems : null;
+        }
 
+        public async Task<CartItems?> CartItemUpdate(CartItems cartItems)
+        {
+            cartItems.TotalPrice = cartItems.Quantity * cartItems.TotalPrice;
+            int result = await _context.CartItems
+                .Where(c => c.CartItemId == cartItems.CartItemId)
+                .ExecuteUpdateAsync(u => u.SetProperty(o => o.Quantity, cartItems.Quantity)
+                                          .SetProperty(o => o.ModifiedAt, DateTime.UtcNow)
+                                          .SetProperty(o => o.TotalPrice, cartItems.TotalPrice));
+            return result > 0 ? cartItems : null;
+        }
+        #endregion
     }
 }

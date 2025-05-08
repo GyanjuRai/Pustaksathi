@@ -1,3 +1,7 @@
+﻿using E2_Dynamics.Model.Shared.Enum;
+using Microsoft.AspNetCore.Mvc;
+using Pustaksathi.API.Controllers.Shared.Auth;
+using Pustaksathi.Interface.Application.Members;
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pustaksathi.API.Controllers.Shared.Auth;
 using Pustaksathi.Interface.Application.Members;
@@ -11,14 +15,15 @@ namespace Pustaksathi.API.Controllers.Application.Members
     public class MemberController: AuthController
     {
         private readonly IMembersService _membersService;
-        public MemberController(IMembersService context)
-        {
-            _membersService = context;
-        }
+        
+        public MemberController(
+            IMembersService context
+        )
+
 
         #region Members Orders
         [HttpGet]
-        public async Task<IActionResult> GetOrdersByUserId([FromQuery]UserIdParam param) //saugat
+        public async Task<IActionResult> GetOrdersByUserId([FromQuery]UserIdParam param) 
         {
             Log.Information("===============================> GET: GetOrdersByUserId");
             try
@@ -85,7 +90,7 @@ namespace Pustaksathi.API.Controllers.Application.Members
         }
 
         [HttpPost]
-        public async Task<IActionResult> CancelOrder([FromBody] OrderIdParam param) //saugat
+        public async Task<IActionResult> CancelOrder([FromBody] OrderIdParam param) 
         {
             Log.Information("===============================> POST: CancelOrder");
             try
@@ -229,7 +234,5 @@ namespace Pustaksathi.API.Controllers.Application.Members
             }
         }
         #endregion
-
-        
     }
 }
