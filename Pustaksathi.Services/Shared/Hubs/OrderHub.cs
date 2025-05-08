@@ -6,7 +6,7 @@ namespace Pustaksathi.Services.Shared.Hubs
     {
         public async Task SendOrderUpdate(string message)
         {
-            await Clients.All.SendAsync("ReceiveOrderUpdate", message);
+            await Clients.All.SendAsync("ReceiveMessage", message);
         }
     }
 }
