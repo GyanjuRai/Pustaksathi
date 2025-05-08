@@ -36,6 +36,15 @@ namespace Pustaksathi.API.Controllers.Shared.Account
                 LoginResponseModel? response = await _accountService.Login(param);
                 if (response == null)
                 {
+                    return Ok(new ResponseModel<object>
+                    {
+                        Type = EnumResponse.NoRecordFound.ToString(),
+                        Message = "No User Found",
+                        Data = null
+                    });
+                }
+                else if (response != null && response.UserId == Guid.Empty)
+                {
                     return BadRequest(new ResponseModel<object>
                     {
                         Type = EnumResponse.Failed.ToString(),
@@ -43,13 +52,15 @@ namespace Pustaksathi.API.Controllers.Shared.Account
                         Data = null
                     });
                 }
-
-                return Ok(new ResponseModel<LoginResponseModel>
+                else
                 {
-                    Type = EnumResponse.Success.ToString(),
-                    Message = "Login Success",
-                    Data = response
-                });
+                    return Ok(new ResponseModel<LoginResponseModel>
+                    {
+                        Type = EnumResponse.Success.ToString(),
+                        Message = "Login Success",
+                        Data = response
+                    });
+                }
             }
             catch (Exception)
             {
