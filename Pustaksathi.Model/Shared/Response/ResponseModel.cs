@@ -14,7 +14,13 @@ namespace Pustaksathi.Model.Shared.Response
     public record GridResponse<T>
     {
         public required int TotalRows { get; set; }
-        public T? Data { get; set; }
+        public List<T>? Data { get; set; }
+    }
+
+    public record FlagResponse
+    {
+        public required bool IsSuccess { get; set; }
+        public required string Message { get; set; }
     }
 
     public record AttributeItemResponse
