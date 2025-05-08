@@ -1,6 +1,7 @@
 ﻿using E2_Dynamics.Model.Shared.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Pustaksathi.API.Const;
 using Pustaksathi.API.Controllers.Shared.Auth;
 using Pustaksathi.Interface.Application.Books;
 using Pustaksathi.Model.Application.Books;
@@ -90,27 +91,30 @@ namespace Pustaksathi.API.Controllers.Application.Books
 
         #region POST
         [HttpPost]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> BooksTsk([FromBody] BooksDetails param)
+        [Authorize(Roles = AppData.AdminPolicy)]
+        public async Task<IActionResult> BooksTsk([FromBody] List<BooksDetails> param)
         {
             try
             {
-                BooksDetails? result = await _bookService.BooksTsk(param);
-                if (result == null)
+                FlagResponse? result = await _bookService.BooksTsk(param);
+                if (result != null && result.IsSuccess)
                 {
-                    return Ok(new ResponseModel<object>
+                    return Ok(new ResponseModel<FlagResponse>
                     {
-                        Type = EnumResponse.Failed.ToString(),
-                        Message = "No Book Found",
-                        Data = null
+                        Type = EnumResponse.Success.ToString(),
+                        Message = "Book Found",
+                        Data = result
                     });
+                    
                 }
-                return Ok(new ResponseModel<BooksDetails>
+
+                return Ok(new ResponseModel<object>
                 {
-                    Type = EnumResponse.Success.ToString(),
-                    Message = "Book Found",
-                    Data = result
+                    Type = EnumResponse.Failed.ToString(),
+                    Message = "No Book Found",
+                    Data = null
                 });
+
             }
             catch (Exception ex)
             {
@@ -125,7 +129,7 @@ namespace Pustaksathi.API.Controllers.Application.Books
         }
 
         [HttpDelete]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = AppData.AdminPolicy)]
         public async Task<IActionResult> BookDel(BookIdParam param)
         {
             try

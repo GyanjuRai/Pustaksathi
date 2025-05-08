@@ -24,7 +24,7 @@ namespace Pustaksathi.Model.Shared.Auth
         public string? Issuer { get; set; } = "";
         public string? Audience { get; set; } = "";
         public int? AccessTokenExpirationMin { get; set; } = 1440;
-        public int? AccessTokenClockSkewMin { get; set; } = 5; // access token validation skew time
+        public int? AccessTokenClockSkewMin { get; set; } = 120; // access token validation skew time
         public int? RefreshTokenExpirationMin { get; set; } = 10080;
     }
 }

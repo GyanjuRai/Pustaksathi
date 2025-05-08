@@ -1,5 +1,8 @@
 ﻿
 
+using Pustaksathi.Model.Application.Members;
+using Pustaksathi.Model.Shared.Account;
+
 namespace Pustaksathi.Model.Application.Books
 {
     public record BooksDetails
@@ -11,7 +14,8 @@ namespace Pustaksathi.Model.Application.Books
         public required decimal Price { get; set; }
         public required int InStock { get; set; }
         public required DateOnly PublishedDate { get; set; }
-        public required bool OnSale { get; set; } = false;
+        public decimal? DiscountPrice { get; set; }
+        public bool? OnSale { get; set; } = false;
         public DateTime? SaleStartDate { get; set; }
         public DateTime? SaleEndDate { get; set; }
         public required List<int> LanguageId { get; set; }
@@ -31,4 +35,30 @@ namespace Pustaksathi.Model.Application.Books
         public int? AuthorId { get; set; }
 
     }
+
+    public record BookIdParam
+    {
+        public required Guid BookId { get; set; }
+    }
+
+    public record Review
+    {
+        public required Guid ReviewId { get; set; } = Guid.Empty;
+        public required Guid BookId { get; set; }
+        public BooksDetails Book { get; set; } = null!;
+
+    }
+
+    public record ReviewItems
+    {
+        public required Guid ReviewItemId { get; set; } = Guid.Empty;
+        public required Guid UserId { get; set; }
+        public required string Review { get; set; }
+        public required int Rating { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
+        public bool IsDeleted { get; set; } = false;
+        public Users User { get; set; } = null!;
+    }
+
 }

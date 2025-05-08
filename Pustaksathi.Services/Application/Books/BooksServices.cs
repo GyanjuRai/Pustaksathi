@@ -194,17 +194,89 @@ namespace Pustaksathi.Services.Application.Books
             }
         }
 
-        public async Task<BooksDetails?> BooksTsk(BooksDetails param)
+        public async Task<FlagResponse?> BooksTsk(List<BooksDetails> param)
         {
+            var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                return param.BookId == Guid.Empty
-                    ? await CreateBooks(param)
-                    : await UpdateBooks(param);
+                int AffectedRow = 0;
+
+                var ExistingBooksList = param.Where(b => b.BookId != Guid.Empty)
+                    .Select(b => b.BookId)
+                    .ToList();
+
+                if (ExistingBooksList.Any())
+                {
+                    var LookUp = await _context.Books
+                        .Where(b => ExistingBooksList.Contains(b.BookId))
+                        .ToDictionaryAsync(b => b.BookId);
+
+                    int updatedRow = await _context.Books
+                        .Where(b => ExistingBooksList.Contains(b.BookId))
+                        .ExecuteUpdateAsync(b => b
+                        .SetProperty(c => c.Title, c => LookUp[c.BookId].Title)
+                        .SetProperty(b => b.Description, c => LookUp[c.BookId].Description)
+                        .SetProperty(b => b.ISBN, c => LookUp[c.BookId].ISBN)
+                        .SetProperty(b => b.Price, c => LookUp[c.BookId].Price)
+                        .SetProperty(b => b.InStock, c => LookUp[c.BookId].InStock)
+                        .SetProperty(b => b.PublishedDate, c => LookUp[c.BookId].PublishedDate)
+                        .SetProperty(b => b.LanguageId, c => LookUp[c.BookId].LanguageId)
+                        .SetProperty(b => b.GenreId, c => LookUp[c.BookId].GenreId)
+                        .SetProperty(b => b.FormatId, c => LookUp[c.BookId].FormatId)
+                        .SetProperty(b => b.AwardId, c => LookUp[c.BookId].AwardId)
+                        .SetProperty(b => b.AuthorId, c => LookUp[c.BookId].AuthorId)
+                        .SetProperty(b => b.ModifiedAt, c => DateTime.UtcNow)
+                        );
+                    AffectedRow += updatedRow;
+                }
+
+                var NewBooksList = param
+                    .Where(b => b.BookId == Guid.Empty)
+                    .Select(b => new BooksDetails
+                    {
+                        BookId = new Guid(),
+                        Title = b.Title,
+                        Description = b.Description,
+                        ISBN = b.ISBN,
+                        Price = b.Price,
+                        InStock = b.InStock,
+                        PublishedDate = b.PublishedDate,
+                        OnSale = b.OnSale,
+                        SaleStartDate = b.SaleStartDate,
+                        SaleEndDate = b.SaleEndDate,
+                        LanguageId = b.LanguageId,
+                        GenreId = b.GenreId,
+                        FormatId = b.FormatId,
+                        AwardId = b.AwardId,
+                        AuthorId = b.AuthorId,
+                        CreatedAt = DateTime.UtcNow,
+                        ModifiedAt = DateTime.UtcNow
+
+                    })
+                    .ToList();
+
+                if (NewBooksList.Any())
+                {
+                    await _context.Books.AddRangeAsync(NewBooksList);
+                    AffectedRow += NewBooksList.Count;
+                }
+
+                await transaction.CommitAsync();
+
+                return AffectedRow > 0 ? new FlagResponse
+                {
+                    IsSuccess = true,
+                    Message = "Books saved successfully"
+                } : new FlagResponse
+                {
+                    IsSuccess = false,
+                    Message = "No books were saved"
+                };
             }
             catch (Exception)
             {
 
+                await transaction.RollbackAsync();
                 throw;
             }
         }

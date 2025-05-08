@@ -19,8 +19,8 @@ namespace Pustaksathi.Model.Shared.Account
 
     public record UserLoginParam
     {
-        public string? Email { get; set; }
-        public string? PasswordHash { get; set; }
+        public required string Email { get; set; }
+        public required string PasswordHash { get; set; }
     }
 
     public record UserInfoResponse

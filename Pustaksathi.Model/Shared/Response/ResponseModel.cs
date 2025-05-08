@@ -39,12 +39,4 @@ namespace Pustaksathi.Model.Shared.Response
         public required string Token { get; set; }
         public required string RefreshToken { get; set; }
     }
-
-    public record FlagResponse
-    {
-        public required bool IsSuccess { get; set; }
-        public required string Message { get; set; }
-    }
-
-    
 }
