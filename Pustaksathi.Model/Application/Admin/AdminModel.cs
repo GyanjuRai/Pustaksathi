@@ -44,9 +44,12 @@ namespace Pustaksathi.Model.Application.Admin
         public required string Title { get; set; }
         public required string Message { get; set; }
         public string? ImageUrl { get; set; }
-        public string? CategoryTabs { get; set; }
-        public string? AnnoucementType { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+    }
+
+    public record AnnoucementIdParam
+    {
+        public required Guid AnnoucementId { get; set; } = Guid.Empty;
     }
 }

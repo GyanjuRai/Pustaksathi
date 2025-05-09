@@ -134,7 +134,149 @@ namespace Pustaksathi.API.Controllers.Application.Admin
         #endregion
 
         #region Annoucement Banner
+        [HttpGet]
+        [Authorize(Roles = AppData.AdminPolicy)]
+        public async Task<IActionResult> AnnoucementsSel([FromQuery]MvReqOptionParam<object> param)
+        {
+            try
+            {
+                Log.Information("=====================================================> GET: AnnoucementsSel");
+                GridResponse<Annoucement>? response = await _adminSerivce.AnnoucementsSel(param);
+                if (response != null && response.Data != null && response.Data.Count > 0)
+                {
+                    return Ok(new ResponseModel<GridResponse<Annoucement>>
+                    {
+                        Type = EnumResponse.Success.ToString(),
+                        Message = "Annoucements List",
+                        Data = response
+                    });
+                }
+                return Ok(new ResponseModel<object>
+                {
+                    Type = EnumResponse.Success.ToString(),
+                    Message = "No Annoucements Found",
+                    Data = null
+                }); 
+            }
+            catch (Exception)
+            {
+                Log.Error("=====================================================> Error: ", ex.Message.ToString());
+                return BadRequest(new ResponseModel<object>
+                {
+                    Type = EnumResponse.SomethingWentWrong.ToString(),
+                    Message = "Something went wrong!",
+                    Data = null,
+                });
+            }
+        }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> AnnoucementsGet()
+        {
+            try
+            {
+                Log.Information("=====================================================> GET: AnnoucementsGet");
+                List<Annoucement>? response = await _adminSerivce.AnnoucementsGet();
+                if (response != null && response.Count > 0)
+                {
+                    return Ok(new ResponseModel<List<Annoucement>>
+                    {
+                        Type = EnumResponse.Success.ToString(),
+                        Message = "Annoucements List",
+                        Data = response
+                    });
+                }
+                return Ok(new ResponseModel<object>
+                {
+                    Type = EnumResponse.Success.ToString(),
+                    Message = "No Annoucements Found",
+                    Data = null
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error("=====================================================> Error: ", ex.Message.ToString());
+                return BadRequest(new ResponseModel<object>
+                {
+                    Type = EnumResponse.SomethingWentWrong.ToString(),
+                    Message = "Something went wrong!",
+                    Data = null,
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = AppData.AdminPolicy)]
+        public async Task<IActionResult> AnnoucementsTsk([FromBody] Annoucement param)
+        {
+            try
+            {
+                Log.Information("=====================================================> POST: ActionResult");
+                FlagResponse? response = await _adminSerivce.AnnoucementsTsk(param);
+                if (response != null && response.IsSuccess)
+                {
+                    return Ok(new ResponseModel<FlagResponse>
+                    {
+                        Type = EnumResponse.Success.ToString(),
+                        Message = response.Message,
+                        Data = response
+                    });
+                }
+                return Ok(new ResponseModel<object>
+                {
+                    Type = EnumResponse.SomethingWentWrong.ToString(),
+                    Message = "Something went wrong!",
+                    Data = null,
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error("=====================================================> Error: ", ex.Message.ToString());
+                return BadRequest(new ResponseModel<object>
+                {
+                    Type = EnumResponse.SomethingWentWrong.ToString(),
+                    Message = "Something went wrong!",
+                    Data = null,
+                });
+            }
+        }
+
+        [HttpDelete]
+        [Authorize(Roles = AppData.AdminPolicy)]
+        public async Task<IActionResult> AnnoucementsDel([FromBody] AnnoucementIdParam param)
+        {
+            try
+            {
+                Log.Information("=====================================================> DELETE: AnnouncementsDel");
+                FlagResponse? response = await _adminSerivce.AnnoucementsDel(param);
+                if (response != null && response.IsSuccess)
+                {
+                    return Ok(new ResponseModel<FlagResponse>
+                    {
+                        Type = EnumResponse.Success.ToString(),
+                        Message = "Annoucements Deleted Successfully",
+                        Data = response
+                    });
+                }
+                return Ok(new ResponseModel<object>
+                {
+                    Type = EnumResponse.SomethingWentWrong.ToString(),
+                    Message = "Something went wrong!",
+                    Data = null,
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error("=====================================================> Error: ", ex.Message.ToString());
+                return BadRequest(new ResponseModel<object>
+                {
+                    Type = EnumResponse.SomethingWentWrong.ToString(),
+                    Message = "Something went wrong!",
+                    Data = null,
+                });
+            }
+        }
         #endregion
     }
 }

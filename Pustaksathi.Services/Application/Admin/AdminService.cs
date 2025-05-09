@@ -1,6 +1,7 @@
 ﻿
 
 using Microsoft.EntityFrameworkCore;
+using MimeKit.Encodings;
 using Pustaksathi.Data.ApplicationDbContext;
 using Pustaksathi.Interface.Application.Admin;
 using Pustaksathi.Model.Application.Admin;
@@ -169,7 +170,138 @@ namespace Pustaksathi.Services.Application.Admin
         #endregion
 
         #region Annoucement Banner
-        public async Task<>
-        #endregion
+        public async Task<GridResponse<Annoucement>?> AnnoucementsSel(MvReqOptionParam<object> param)
+        {
+            var query = _context.Annoucements.AsQueryable();
+            try
+            {
+                //===========================
+                //        Sort
+                //===========================
+                #region Sort
+                if (!string.IsNullOrEmpty(param.SortBy))
+                {
+                    if (param.SortOrder == "asc")
+                    {
+                        query = query.OrderBy(b => EF.Property<object>(b, param.SortBy));
+                    }
+                    else
+                    {
+                        query = query.OrderByDescending(b => EF.Property<object>(b, param.SortBy));
+                    }
+                }
+                #endregion
+
+                //===========================
+                //        Pagination
+                //===========================
+                #region Pagination
+                int totalCount = await query.CountAsync();
+                var items = await query
+                    .Skip(param.OffSet)
+                    .Take(param.PageSize)
+                    .ToListAsync();
+                #endregion
+
+                return new GridResponse<Annoucement>
+                {
+                    TotalRows = totalCount,
+                    Data = items
+                };
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task<FlagResponse?> AnnoucementsTsk(Annoucement param)
+        {
+            int result = 0;
+            try
+            {
+                if (param.AnnoucementId != Guid.Empty)
+                {
+                    param.AnnoucementId = Guid.NewGuid();
+                    await _context.Annoucements.AddAsync(new Annoucement
+                    {
+                        AnnoucementId = param.AnnoucementId,
+                        Title = param.Title,
+                        Message = param.Message,
+                        ImageUrl = param.ImageUrl,
+                        StartDate = param.StartDate,
+                        EndDate = param.EndDate
+                    });
+                    result = await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    result = await _context.Annoucements
+                        .Where(b => b.AnnoucementId == param.AnnoucementId)
+                        .ExecuteUpdateAsync(b => b
+                            .SetProperty(b => b.Title, param.Title)
+                            .SetProperty(b => b.Message, param.Message)
+                            .SetProperty(b => b.ImageUrl, param.ImageUrl)
+                            .SetProperty(b => b.StartDate, param.StartDate)
+                            .SetProperty(b => b.EndDate, param.EndDate));
+                }
+                return result > 0 ? new FlagResponse
+                {
+                    IsSuccess = true,
+                    Message = "Annoucement Saved Successfully"
+                } : new FlagResponse
+                {
+                    IsSuccess = false,
+                    Message = "Annoucement Creation Failed"
+                };
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<FlagResponse?> AnnoucementsDel(AnnoucementIdParam param)
+        {
+            int result = 0;
+            try
+            {
+                result = await _context.Annoucements
+                    .Where(b => b.AnnoucementId == param.AnnoucementId)
+                    .ExecuteDeleteAsync();
+                return result > 0 ? new FlagResponse
+                {
+                    IsSuccess = true,
+                    Message = "Annoucement Deleted Successfully"
+                } : new FlagResponse
+                {
+                    IsSuccess = false,
+                    Message = "Annoucement Deletion Failed"
+                };
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Annoucement>?> AnnoucementsGet()
+        {
+            try
+            {
+                List<Annoucement> response = await _context.Annoucements
+                    .Where(a => a.StartDate <= DateTime.UtcNow && a.EndDate >= DateTime.UtcNow)
+                    .ToListAsync();
+
+                return response;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        #endregion 
     }
 }
