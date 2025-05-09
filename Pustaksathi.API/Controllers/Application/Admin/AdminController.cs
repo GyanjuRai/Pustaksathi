@@ -68,15 +68,28 @@ namespace Pustaksathi.API.Controllers.Application.Admin
             {
                 Log.Information("===============================================> POST: DiscountTsk");
                 FlagResponse? response = await _adminSerivce.TimedDiscountTsk(param);
-                if (response != null && response.IsSuccess)
+                if (response != null)
                 {
-                    return Ok(new ResponseModel<FlagResponse>
+                    if (response.IsSuccess)
                     {
-                        Type = EnumResponse.Success.ToString(),
-                        Message = "Discount Inserted/Updated Successfully",
-                        Data = response
-                    });
+                        return Ok(new ResponseModel<FlagResponse>
+                        {
+                            Type = EnumResponse.Success.ToString(),
+                            Message = response.Message,
+                            Data = response
+                        });
+                    }
+                    else
+                    {
+                        return Ok(new ResponseModel<FlagResponse>
+                        {
+                            Type = EnumResponse.Failed.ToString(),
+                            Message = response.Message,
+                            Data = null,
+                        });
+                    }
                 }
+
                 return Ok(new ResponseModel<object>
                 {
                     Type = EnumResponse.SomethingWentWrong.ToString(),
@@ -158,7 +171,7 @@ namespace Pustaksathi.API.Controllers.Application.Admin
                     Data = null
                 }); 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 Log.Error("=====================================================> Error: ", ex.Message.ToString());
                 return BadRequest(new ResponseModel<object>

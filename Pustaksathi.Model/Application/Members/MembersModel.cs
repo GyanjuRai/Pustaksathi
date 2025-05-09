@@ -19,6 +19,7 @@ namespace Pustaksathi.Model.Application.Members
         public decimal TotalAmount { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
+        public Users User { get; set; } = null!;
         public IReadOnlyCollection<OrderItems> OrderItems { get; set; } = new List<OrderItems>();
     }
 
@@ -30,6 +31,8 @@ namespace Pustaksathi.Model.Application.Members
         public string? BookTitle { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
+        public Orders Order { get; set; } = null!;
+        public BooksDetails Book { get; set; } = null!;
     }
     #endregion
 
@@ -40,7 +43,7 @@ namespace Pustaksathi.Model.Application.Members
         public Guid UserId { get; set; }
         public DateTime? AddedAt { get; set; }
         public Users? users { get; set; }
-        public IReadOnlyCollection<WhiteListItems> WhiteListItems { get; set; } = new List<WhiteListItems>();
+        public ICollection<WhiteListItems> WhiteListItems { get; set; } = new List<WhiteListItems>();
     }
 
     public record WhiteListItems
@@ -49,8 +52,8 @@ namespace Pustaksathi.Model.Application.Members
         public Guid WhiteListId { get; set; }
         public Guid BookId { get; set; }
         public DateTime? AddedAt { get; set; }
-        public BooksDetails? books { get; set; }
-        public WhiteList? WhiteList { get; set; }
+        public BooksDetails books { get; set; } = null!;
+        public WhiteList WhiteList { get; set; } = null!;
     }
     #endregion
 
@@ -61,6 +64,7 @@ namespace Pustaksathi.Model.Application.Members
         public Guid UserId { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
+        public Users User { get; set; } = null!;
         public IReadOnlyCollection<CartItems> CartItems { get; set; } = new List<CartItems>();
     }
     public record CartItems
@@ -73,6 +77,8 @@ namespace Pustaksathi.Model.Application.Members
         public decimal TotalPrice { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
+        public Cart Cart { get; set; } = null!;
+        public BooksDetails Book { get; set; } = null!;
     }
 
     #endregion
@@ -88,11 +94,11 @@ namespace Pustaksathi.Model.Application.Members
     }
     public record WhiteListItemIdParam
     {
-        public required Guid WhiteListId { get; set; }
+        public required Guid WhiteListItemId { get; set; }
     }
     public record CartItemsIdParam
     {
-        public required Guid CartId { get; set; }
+        public required Guid CartItemsId { get; set; }
     }
     public record WhiteListTskParam
     {

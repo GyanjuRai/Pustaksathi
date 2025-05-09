@@ -10,7 +10,6 @@ namespace Pustaksathi.Model.Shared.Attribute
     {
         public required int AttributeItemId { get; set; }
         public required int AttributeCategoryId { get; set; }
-
         public required string ItemName { get; set; }
         public required string ItemValue { get; set; }
         public string? Description { get; set; }
@@ -23,5 +22,10 @@ namespace Pustaksathi.Model.Shared.Attribute
         public required string CategoryName { get; set; }
         public string? Description { get; set; }
         public ICollection<AttributeItem> AttributeItems { get; init; } = new List<AttributeItem>();
+    }
+
+    public record AttributeCategoryParam
+    {
+        public required string CategoryName { get; set; }
     }
 }

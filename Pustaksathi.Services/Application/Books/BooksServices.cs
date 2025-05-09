@@ -18,6 +18,7 @@ namespace Pustaksathi.Services.Application.Books
         {
             _context = context;
         }
+        #region Book Core Service
         public async Task<GridResponse<BooksDetails>?> BooksSel(MvReqOptionParam<BookFitlerOptionParam> param)
         {
             try
@@ -81,11 +82,35 @@ namespace Pustaksathi.Services.Application.Books
                             break;
 
                         case "deals":
-                            query = query
-                                .Where(b => b.OnSale
-                                                   && b.SaleStartDate <= DateTime.UtcNow
-                                                   && b.SaleEndDate >= DateTime.UtcNow)
-                                .OrderByDescending(b => b.SaleStartDate);
+                            query = from b in _context.Books
+                                    join d in _context.TimeDiscounts
+                                    on b.BookId equals d.BookId into DiscountGroup
+                                    let latest = DiscountGroup
+                                    .Where(d => !d.IsDeleted)
+                                    .OrderByDescending(d => d.SaleStartDate)
+                                    .FirstOrDefault()
+                                    select new BooksDetails
+                                    {
+                                        BookId = b.BookId,
+                                        Title = b.Title,
+                                        Description = b.Description,
+                                        ISBN = b.ISBN,
+                                        Price = b.Price,
+                                        InStock = b.InStock,
+                                        PublishedDate = b.PublishedDate,
+                                        LanguageId = b.LanguageId,
+                                        GenreId = b.GenreId,
+                                        FormatId = b.FormatId,
+                                        AwardId = b.AwardId,
+                                        AuthorId = b.AuthorId,
+                                        CreatedAt = b.CreatedAt,
+                                        ModifiedAt = b.ModifiedAt,
+                                        DiscountPrice = (latest != null 
+                                        && latest.OnSale
+                                         && latest.SaleStartDate <= DateTime.UtcNow
+                                        && latest.SaleEndDate >= DateTime.UtcNow)
+                                        ? latest.DiscountPrice : null
+                                    };
                             break;
 
                         default:
@@ -241,9 +266,6 @@ namespace Pustaksathi.Services.Application.Books
                         Price = b.Price,
                         InStock = b.InStock,
                         PublishedDate = b.PublishedDate,
-                        OnSale = b.OnSale,
-                        SaleStartDate = b.SaleStartDate,
-                        SaleEndDate = b.SaleEndDate,
                         LanguageId = b.LanguageId,
                         GenreId = b.GenreId,
                         FormatId = b.FormatId,
@@ -306,11 +328,137 @@ namespace Pustaksathi.Services.Application.Books
                 throw;
             }
         }
+        #endregion
 
+        #region Review Core Service
+        public async Task<FlagResponse?> ReviewCheck(CheckReviewParam param)
+        {
+            try
+            {
+                bool result = await _context.Orders
+                    .Include(o => o.OrderItems)
+                    .AnyAsync(o => o.UserId == param.UserId && o.OrderItems.Any(oi => oi.BookId == param.BookId) && !o.IsCancelled);
+
+                if (result)
+                {
+                    return new FlagResponse
+                    {
+                        IsSuccess = true,
+                        Message = "User can review"
+                    };
+                }
+                return new FlagResponse
+                {
+                    IsSuccess = false,
+                    Message = "User cannot review"
+                };
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Review>?> ReviewItemsSel(BookIdParam param)
+        {
+            try
+            {
+                List<Review>? response = await _context.Reviews
+                    .Where(r => r.BookId == param.BookId)
+                    .ToListAsync();
+                if (response != null && response.Count > 0)
+                {
+                    return response;
+                }
+                return null;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<FlagResponse?> ReviewTsk(Review param)
+        {
+            try
+            {
+                if (param.ReviewId == Guid.Empty)
+                {
+                    param.ReviewId = Guid.NewGuid();
+                    param.CreatedAt = DateTime.UtcNow;
+                    param.ModifiedAt = DateTime.UtcNow;
+                    await _context.Reviews.AddAsync(param);
+                }
+                else
+                {
+                    Review? existingReview = await _context.Reviews
+                        .FirstOrDefaultAsync(r => r.ReviewId == param.ReviewId);
+                    if (existingReview == null)
+                    {
+                        return new FlagResponse
+                        {
+                            IsSuccess = false,
+                            Message = "Review not found"
+                        };
+                    }
+                    existingReview.Rating = param.Rating;
+                    existingReview.ReviewText = param.ReviewText;
+                    existingReview.ModifiedAt = DateTime.UtcNow;
+                    _context.Reviews.Update(existingReview);
+                }
+                int result = await _context.SaveChangesAsync();
+                if (result <= 0)
+                {
+                    return new FlagResponse
+                    {
+                        IsSuccess = false,
+                        Message = "Failed to save review"
+                    };
+                }
+
+                return new FlagResponse
+                {
+                    IsSuccess = true,
+                    Message = "Review saved successfully"
+                };
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<FlagResponse?> ReviewDel(Review param)
+        {
+            try
+            {
+                int result = await _context.Reviews
+                    .Where(r => r.ReviewId == param.ReviewId)
+                    .ExecuteUpdateAsync(r => r.SetProperty(b => b.IsDeleted, true));
+                if (result > 0)
+                {
+                    return new FlagResponse
+                    {
+                        IsSuccess = true,
+                        Message = "Review deleted successfully"
+                    };
+                }
+                return new FlagResponse
+                {
+                    IsSuccess = false,
+                    Message = "Review not found"
+                };
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        #endregion
         ///===================================
         ///      Helper Functions
         ///===================================
-            #region Helper Functions
+        #region Helper Functions
         public async Task<BooksDetails?> CreateBooks(BooksDetails param)
         {
             BooksDetails? existingBook = await _context.Books
@@ -342,9 +490,6 @@ namespace Pustaksathi.Services.Application.Books
             existingBook.Price = param.Price;
             existingBook.InStock = param.InStock;
             existingBook.PublishedDate = param.PublishedDate;
-            existingBook.OnSale = param.OnSale;
-            existingBook.SaleStartDate = param.SaleStartDate;
-            existingBook.SaleEndDate = param.SaleEndDate;
             existingBook.LanguageId = param.LanguageId;
             existingBook.GenreId = param.GenreId;
             existingBook.FormatId = param.FormatId;

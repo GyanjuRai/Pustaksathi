@@ -27,6 +27,19 @@ namespace Pustaksathi.Services.Application.Admin
             {
                 if (param.DiscountId != Guid.Empty)
                 {
+                    var existingDiscount = await _context.TimeDiscounts
+                        .Where(b => b.BookId == param.BookId)
+                        .FirstOrDefaultAsync();
+
+                    if (existingDiscount != null && !existingDiscount.IsDeleted)
+                    {
+                        return new FlagResponse
+                        {
+                            IsSuccess = true,
+                            Message = "Timed Discount Already Exists"
+                        };
+                    }
+
                     param.DiscountId = Guid.NewGuid();
                     await _context.TimeDiscounts.AddAsync(new TimeDiscount
                     {
@@ -49,18 +62,6 @@ namespace Pustaksathi.Services.Application.Admin
                                             .SetProperty(b => b.OnSale, param.OnSale)
                                             .SetProperty(b => b.SaleStartDate, param.SaleStartDate)
                                             .SetProperty(b => b.SaleEndDate, param.SaleEndDate));
-                }
-
-                if(result > 0)
-                {
-                    await _context.Books
-                        .Where(b => b.BookId == param.BookId)
-                        .ExecuteUpdateAsync(b => b
-                        .SetProperty(b => b.OnSale, param.OnSale)
-                        .SetProperty(b => b.SaleStartDate, param.SaleStartDate)
-                        .SetProperty(b => b.SaleEndDate, param.SaleEndDate)
-                        .SetProperty(b => b.DiscountPrice, param.DiscountPrice)
-                        );
                 }
 
                 return result > 0 ? new FlagResponse

@@ -1,6 +1,7 @@
 ﻿
 
 using Microsoft.EntityFrameworkCore;
+using Pustaksathi.Model.Application.Admin;
 using Pustaksathi.Model.Application.Books;
 using Pustaksathi.Model.Application.Members;
 using Pustaksathi.Model.Shared.Account;
@@ -24,6 +25,9 @@ namespace Pustaksathi.Data.ApplicationDbContext
         public DbSet<WhiteListItems> WhiteListItems { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItems> CartItems { get; set; }
+        public DbSet<TimeDiscount> TimeDiscounts { get; set; }
+        public DbSet<Annoucement> Annoucements { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,6 +35,11 @@ namespace Pustaksathi.Data.ApplicationDbContext
             UserModelBuilder(modelBuilder);
             BookModelBuilder(modelBuilder);
             OrderModelBuilder(modelBuilder);
+            CartModelBuilder(modelBuilder);
+            WhiteListModelBuilder(modelBuilder);
+            TimeDiscountModelBuilder(modelBuilder);
+            AnnoucementModelBuilder(modelBuilder);
+            ReviewModelBuilder(modelBuilder);
         }
 
         // ============================
@@ -60,10 +69,12 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 entity.HasKey(tb => tb.AttributeItemId);
 
                 entity.Property(tb => tb.ItemName)
-                 .IsRequired();
+                 .IsRequired()
+                 .HasMaxLength(100);
 
                 entity.Property(tb => tb.ItemValue)
-                .IsRequired();
+                .IsRequired()
+                .HasMaxLength(100);
 
                 entity.Property(tb => tb.AttributeCategoryId)
                 .IsRequired();
@@ -133,9 +144,9 @@ namespace Pustaksathi.Data.ApplicationDbContext
                     .HasMaxLength(50)
                     .IsRequired();
 
-                    tb.HasMany(o => o.OrderItems)
-                    .WithOne()
-                    .HasForeignKey(oi => oi.OrderId)
+                    tb.HasOne(o => o.User)
+                    .WithMany()
+                    .HasForeignKey(o => o.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
 
                     tb.HasQueryFilter(tb => !tb.IsCancelled);
@@ -145,6 +156,16 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 tb =>
                 {
                     tb.HasKey(tb => tb.OrderItemId);
+
+                    tb.HasOne(oi => oi.Order)
+                    .WithMany(o => o.OrderItems)
+                    .HasForeignKey(oi => oi.OrderId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                    tb.HasOne(oi => oi.Book)
+                    .WithMany(b => b.OrderItems)
+                    .HasForeignKey(oi => oi.BookId)
+                    .OnDelete(DeleteBehavior.Restrict);
                 });
         }
         #endregion
@@ -159,15 +180,26 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 tb =>
                 {
                     tb.HasKey(tb => tb.CartId);
-                    tb.HasMany(tb => tb.CartItems)
-                    .WithOne()
-                    .HasForeignKey(tb => tb.CartId)
+
+                    tb.HasOne(tb => tb.User)
+                    .WithMany()
+                    .HasForeignKey(tb => tb.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
                 });
             builder.Entity<CartItems>(
                 tb =>
                 {
                     tb.HasKey(tb => tb.CartItemId);
+
+                    tb.HasOne(tb => tb.Cart)
+                    .WithMany(c => c.CartItems)
+                    .HasForeignKey(tb => tb.CartId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                    tb.HasOne(tb => tb.Book)
+                    .WithMany(b => b.CartItems)
+                    .HasForeignKey(tb => tb.BookId)
+                    .OnDelete(DeleteBehavior.Restrict);
                 });
         }
         #endregion
@@ -182,15 +214,84 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 tb =>
                 {
                     tb.HasKey(tb => tb.WhiteListId);
-                    tb.HasMany(tb => tb.WhiteListItems)
-                    .WithOne()
-                    .HasForeignKey(tb => tb.WhiteListId)
+                    
+                    tb.HasOne(tb => tb.users)
+                    .WithMany()
+                    .HasForeignKey(tb => tb.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
                 });
+
             builder.Entity<WhiteListItems>(
                 tb =>
                 {
                     tb.HasKey(tb => tb.WhiteListItemId);
+
+                    tb.HasOne(tb => tb.WhiteList)
+                    .WithMany(wl => wl.WhiteListItems)
+                    .HasForeignKey(tb => tb.WhiteListId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                    tb.HasOne(tb => tb.books)
+                    .WithMany(b => b.WhiteListItems)
+                    .HasForeignKey(tb => tb.BookId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                });
+        }
+        #endregion
+
+        // ============================
+        // TimeDiscount Configuration ==
+        // ============================
+        #region TimeDiscount configuration
+        public void TimeDiscountModelBuilder(ModelBuilder builder)
+        {
+            builder.Entity<TimeDiscount>(
+                tb =>
+                {
+                    tb.HasKey(tb => tb.DiscountId);
+
+                    tb.HasOne(tb => tb.Book)
+                    .WithMany(b => b.TimeDiscounts)
+                    .HasForeignKey(tb => tb.BookId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                });
+        }
+        #endregion
+
+        // ============================
+        // Annoucement Configuration ===
+        // ============================
+        #region Annoucement configuration
+        public void AnnoucementModelBuilder(ModelBuilder builder)
+        {
+            builder.Entity<Annoucement>(
+                tb =>
+                {
+                    tb.HasKey(tb => tb.AnnoucementId);
+                });
+        }
+        #endregion
+
+        // ============================
+        // Review Configuration =======
+        // ============================
+        #region Review configuration
+        public void ReviewModelBuilder(ModelBuilder builder)
+        {
+            builder.Entity<Review>(
+                tb =>
+                {
+                    tb.HasKey(tb => tb.ReviewId);
+
+                    tb.HasOne(tb => tb.User)
+                    .WithMany()
+                    .HasForeignKey(tb => tb.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                    tb.HasOne(tb => tb.Book)
+                    .WithMany(tb => tb.Reviews)
+                    .HasForeignKey(tb => tb.BookId)
+                    .OnDelete(DeleteBehavior.Cascade);
                 });
         }
         #endregion

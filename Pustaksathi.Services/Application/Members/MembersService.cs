@@ -58,16 +58,10 @@ namespace Pustaksathi.Services.Application.Members
                 else
                 {
                     bool res = await LoyalityDiscountUpdate(param.UserId);
-                    if (res)
-                    {
-                        param.TotalAmount = param.TotalAmount - (param.TotalAmount * 0.1m);
-                    }
+                    if (res) param.TotalAmount = param.TotalAmount - (param.TotalAmount * 0.1m);
                 }
 
-                if (param.QuantityDiscount)
-                {
-                    param.TotalAmount = param.TotalAmount - (param.TotalAmount * 0.05m);
-                }
+                if (param.QuantityDiscount) param.TotalAmount = param.TotalAmount - (param.TotalAmount * 0.05m);
 
                 if (param.OrderId == Guid.Empty)
                 {
@@ -203,7 +197,7 @@ namespace Pustaksathi.Services.Application.Members
             try
             {
                 int result = await _context.WhiteListItems
-                    .Where(w => w.WhiteListItemId == param.WhiteListId)
+                    .Where(w => w.WhiteListItemId == param.WhiteListItemId)
                     .ExecuteDeleteAsync();
 
                 if (result == 0)
@@ -298,7 +292,7 @@ namespace Pustaksathi.Services.Application.Members
             try
             {
                 int result = await _context.CartItems
-                    .Where(c => c.CartItemId == param.CartId)
+                    .Where(c => c.CartItemId == param.CartItemsId)
                     .ExecuteDeleteAsync();
                 if (result == 0)
                 {
