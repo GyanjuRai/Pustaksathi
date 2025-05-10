@@ -9,7 +9,7 @@ namespace Pustaksathi.Model.Application.Books
 {
     public record BooksDetails
     {
-        public required Guid BookId { get; set; } = new Guid();
+        public int BookId { get; set; }
         public required string Title { get; set; }
         public required string Description { get; set; }
         public required string ISBN { get; set; }
@@ -41,14 +41,14 @@ namespace Pustaksathi.Model.Application.Books
 
     public record BookIdParam
     {
-        public required Guid BookId { get; set; }
+        public required int BookId { get; set; }
     }
 
     public record Review
     {
-        public required Guid ReviewId { get; set; } = Guid.Empty;
-        public required Guid BookId { get; set; }
-        public required Guid UserId { get; set; }
+        public int ReviewId { get; set; }
+        public required int BookId { get; set; }
+        public required int UserId { get; set; }
         public required int Rating { get; set; }
         public required string ReviewText { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -61,8 +61,8 @@ namespace Pustaksathi.Model.Application.Books
 
     public record CheckReviewParam
     {
-        public required Guid BookId { get; set; }
-        public required Guid UserId { get; set; }
+        public required int BookId { get; set; }
+        public required int UserId { get; set; }
     }
 
 }

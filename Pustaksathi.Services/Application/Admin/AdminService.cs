@@ -25,7 +25,7 @@ namespace Pustaksathi.Services.Application.Admin
             int result = 0;
             try
             {
-                if (param.DiscountId == Guid.Empty)
+                if (param.DiscountId == 0)
                 {
                     var existingDiscount = await _context.TimeDiscounts
                         .Where(b => b.BookId == param.BookId)
@@ -40,10 +40,8 @@ namespace Pustaksathi.Services.Application.Admin
                         };
                     }
 
-                    param.DiscountId = Guid.NewGuid();
                     await _context.TimeDiscounts.AddAsync(new TimeDiscount
                     {
-                        DiscountId = param.DiscountId,
                         BookId = param.BookId,
                         DiscountPrice = param.DiscountPrice,
                         SaleStartDate = param.SaleStartDate,
@@ -222,12 +220,10 @@ namespace Pustaksathi.Services.Application.Admin
             int result = 0;
             try
             {
-                if (param.AnnoucementId == Guid.Empty)
+                if (param.AnnoucementId == 0)
                 {
-                    param.AnnoucementId = Guid.NewGuid();
                     await _context.Annoucements.AddAsync(new Annoucement
                     {
-                        AnnoucementId = param.AnnoucementId,
                         Title = param.Title,
                         Message = param.Message,
                         ImageUrl = param.ImageUrl,

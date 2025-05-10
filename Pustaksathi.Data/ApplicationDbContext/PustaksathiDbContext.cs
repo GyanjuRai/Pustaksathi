@@ -53,6 +53,10 @@ namespace Pustaksathi.Data.ApplicationDbContext
             builder.Entity<AttributeCategory>(entity =>
             {
                 entity.HasKey(tb => tb.AttributeCategoryId);
+                entity.Property(tb => tb.AttributeCategoryId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
+
                 entity.Property(tb => tb.CategoryName)
                     .IsRequired()
                     .HasMaxLength(100);
@@ -67,6 +71,9 @@ namespace Pustaksathi.Data.ApplicationDbContext
             builder.Entity<AttributeItem>(entity =>
             {
                 entity.HasKey(tb => tb.AttributeItemId);
+                entity.Property(tb => tb.AttributeItemId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                 entity.Property(tb => tb.ItemName)
                  .IsRequired()
@@ -92,6 +99,9 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 tb =>
                 {
                     tb.HasKey(u => u.UserId);
+                    tb.Property(u => u.UserId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.HasOne(u => u.Role)
                     .WithOne()
@@ -122,6 +132,9 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 tb =>
                 {
                     tb.HasKey(b => b.BookId);
+                    tb.Property(b => b.BookId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
                 });
         }
         #endregion
@@ -136,6 +149,9 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 tb =>
                 {
                     tb.HasKey(o => o.OrderId);
+                    tb.Property(o => o.OrderId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.Property(tb => tb.Status)
                     .HasMaxLength(50)
@@ -155,6 +171,9 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 tb =>
                 {
                     tb.HasKey(tb => tb.OrderItemId);
+                    tb.Property(tb => tb.OrderItemId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.HasOne(oi => oi.Order)
                     .WithMany(o => o.OrderItems)
@@ -179,6 +198,9 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 tb =>
                 {
                     tb.HasKey(tb => tb.CartId);
+                    tb.Property(tb => tb.CartId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.HasOne(tb => tb.User)
                     .WithMany()
@@ -189,6 +211,9 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 tb =>
                 {
                     tb.HasKey(tb => tb.CartItemId);
+                    tb.Property(tb => tb.CartItemId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.HasOne(tb => tb.Cart)
                     .WithMany(c => c.CartItems)
@@ -213,7 +238,11 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 tb =>
                 {
                     tb.HasKey(tb => tb.WhiteListId);
-                    
+                    tb.Property(tb => tb.WhiteListId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
+
+
                     tb.HasOne(tb => tb.users)
                     .WithMany()
                     .HasForeignKey(tb => tb.UserId)
@@ -224,6 +253,9 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 tb =>
                 {
                     tb.HasKey(tb => tb.WhiteListItemId);
+                    tb.Property(tb => tb.WhiteListItemId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.HasOne(tb => tb.WhiteList)
                     .WithMany(wl => wl.WhiteListItems)
@@ -248,6 +280,9 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 tb =>
                 {
                     tb.HasKey(tb => tb.DiscountId);
+                    tb.Property(tb => tb.DiscountId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.HasOne(tb => tb.Book)
                     .WithMany(b => b.TimeDiscounts)
@@ -267,6 +302,9 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 tb =>
                 {
                     tb.HasKey(tb => tb.AnnoucementId);
+                    tb.Property(tb => tb.AnnoucementId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
                 });
         }
         #endregion
@@ -281,6 +319,9 @@ namespace Pustaksathi.Data.ApplicationDbContext
                 tb =>
                 {
                     tb.HasKey(tb => tb.ReviewId);
+                    tb.Property(tb => tb.ReviewId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.HasOne(tb => tb.User)
                     .WithMany()

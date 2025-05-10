@@ -43,7 +43,7 @@ namespace Pustaksathi.API.Controllers.Shared.Account
                         Data = null
                     });
                 }
-                else if (response != null && response.UserId == Guid.Empty)
+                else if (response != null && response.UserId == 0)
                 {
                     return BadRequest(new ResponseModel<object>
                     {

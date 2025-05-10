@@ -66,7 +66,7 @@ namespace Pustaksathi.Services.Application.Members
             }
 
             Orders? response;
-            if (param.OrderId == Guid.Empty)
+            if (param.OrderId == 0)
             {
                 param.ClaimCode = ClaimCodeGenerator();
                 param.OrderDate = DateTime.UtcNow;
@@ -163,7 +163,6 @@ namespace Pustaksathi.Services.Application.Members
                 {
                     whiteList = new WhiteList
                     {
-                        WhiteListId = new Guid(),
                         UserId = param.UserId,
                         AddedAt = DateTime.UtcNow
                     };
@@ -175,7 +174,6 @@ namespace Pustaksathi.Services.Application.Members
                 {
                     WhiteListItems whiteListItems = new WhiteListItems
                     {
-                        WhiteListItemId = Guid.NewGuid(),
                         BookId = item.BookId,
                         WhiteListId = whiteList.WhiteListId,
                         AddedAt = DateTime.UtcNow
@@ -254,22 +252,22 @@ namespace Pustaksathi.Services.Application.Members
             try
             {
                 CartItems? response;
-                if (param.CartItems.CartId == Guid.Empty)
+                if (param.CartItems.CartId == 0)
                 {
                     Cart cart = new Cart
                     {
-                        CartId = Guid.NewGuid(),
                         UserId = param.UserId,
                         CreatedAt = DateTime.UtcNow,
                         ModifiedAt = DateTime.UtcNow
                     };
                     await _context.Carts.AddAsync(cart);
-                    param.CartItems.CartId = cart.CartId;
                     await _context.SaveChangesAsync();
+
+                    param.CartItems.CartId = cart.CartId;
                     
                 }
 
-                if(param.CartItems.CartId == Guid.Empty)
+                if(param.CartItems.CartItemId == 0)
                 {
                    response = await CartItemTsk(param.CartItems);
                     return response != null ? new FlagResponse
@@ -330,7 +328,7 @@ namespace Pustaksathi.Services.Application.Members
         // Helper functions   =========
         // ============================
         #region Helper functions
-        public async Task<bool> LoyalityDiscountUpdate(Guid UserId)
+        public async Task<bool> LoyalityDiscountUpdate(int UserId)
         {
             int result = await _context.Orders.CountAsync(o => o.UserId == UserId);
             if (result >= 0)
@@ -390,7 +388,6 @@ namespace Pustaksathi.Services.Application.Members
         
         public async Task<CartItems?> CartItemTsk(CartItems cartItems)
         {
-            cartItems.CartItemId = Guid.NewGuid();
             cartItems.CreatedAt = DateTime.UtcNow;
             cartItems.ModifiedAt = DateTime.UtcNow;
             await _context.CartItems.AddAsync(cartItems);

@@ -59,7 +59,7 @@ namespace Pustaksathi.Services.Shared.Account
                     {
                         return new LoginResponseModel
                         {
-                            UserId = Guid.Empty,
+                            UserId = 0,
                             FullName = "",
                             Email = "",
                             Role = "",
@@ -83,7 +83,7 @@ namespace Pustaksathi.Services.Shared.Account
         {
             try
             {
-               return param.UserId == Guid.Empty 
+               return param.UserId == 0 
                     ? await CreateUser(param) 
                     : await UpdateUser(param);
             }
@@ -134,7 +134,6 @@ namespace Pustaksathi.Services.Shared.Account
                 return null;
             }
 
-            param.UserId = new Guid();
             param.CreatedAt = DateTime.UtcNow;
             param.ModifiedAt = DateTime.UtcNow;
             await _context.Users.AddAsync(param);

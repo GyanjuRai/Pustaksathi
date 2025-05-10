@@ -16,7 +16,7 @@ namespace Pustaksathi.Model.Shared.Param
 
     public record UserIdParam
     {
-        public required Guid UserId { get; set; }
+        public required int UserId { get; set; }
     }
 
     

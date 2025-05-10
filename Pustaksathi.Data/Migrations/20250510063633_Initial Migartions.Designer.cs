@@ -13,8 +13,8 @@ using Pustaksathi.Data.ApplicationDbContext;
 namespace Pustaksathi.Data.Migrations
 {
     [DbContext(typeof(PustaksathiDbContext))]
-    [Migration("20250510050738_Initial Migration")]
-    partial class InitialMigration
+    [Migration("20250510063633_Initial Migartions")]
+    partial class InitialMigartions
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,9 +28,11 @@ namespace Pustaksathi.Data.Migrations
 
             modelBuilder.Entity("Pustaksathi.Model.Application.Admin.Annoucement", b =>
                 {
-                    b.Property<Guid>("AnnoucementId")
+                    b.Property<int>("AnnoucementId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AnnoucementId"));
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("timestamp with time zone");
@@ -56,12 +58,14 @@ namespace Pustaksathi.Data.Migrations
 
             modelBuilder.Entity("Pustaksathi.Model.Application.Admin.TimeDiscount", b =>
                 {
-                    b.Property<Guid>("DiscountId")
+                    b.Property<int>("DiscountId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
 
-                    b.Property<Guid>("BookId")
-                        .HasColumnType("uuid");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DiscountId"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -90,9 +94,11 @@ namespace Pustaksathi.Data.Migrations
 
             modelBuilder.Entity("Pustaksathi.Model.Application.Books.BooksDetails", b =>
                 {
-                    b.Property<Guid>("BookId")
+                    b.Property<int>("BookId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("BookId"));
 
                     b.Property<int>("AuthorId")
                         .HasColumnType("integer");
@@ -153,12 +159,14 @@ namespace Pustaksathi.Data.Migrations
 
             modelBuilder.Entity("Pustaksathi.Model.Application.Books.Review", b =>
                 {
-                    b.Property<Guid>("ReviewId")
+                    b.Property<int>("ReviewId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
 
-                    b.Property<Guid>("BookId")
-                        .HasColumnType("uuid");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ReviewId"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -176,8 +184,8 @@ namespace Pustaksathi.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("ReviewId");
 
@@ -190,9 +198,11 @@ namespace Pustaksathi.Data.Migrations
 
             modelBuilder.Entity("Pustaksathi.Model.Application.Members.Cart", b =>
                 {
-                    b.Property<Guid>("CartId")
+                    b.Property<int>("CartId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CartId"));
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -200,8 +210,8 @@ namespace Pustaksathi.Data.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("CartId");
 
@@ -212,18 +222,20 @@ namespace Pustaksathi.Data.Migrations
 
             modelBuilder.Entity("Pustaksathi.Model.Application.Members.CartItems", b =>
                 {
-                    b.Property<Guid>("CartItemId")
+                    b.Property<int>("CartItemId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
 
-                    b.Property<Guid>("BookId")
-                        .HasColumnType("uuid");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CartItemId"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("BookTitle")
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("CartId")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("CartId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -248,18 +260,20 @@ namespace Pustaksathi.Data.Migrations
 
             modelBuilder.Entity("Pustaksathi.Model.Application.Members.OrderItems", b =>
                 {
-                    b.Property<Guid>("OrderItemId")
+                    b.Property<int>("OrderItemId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
 
-                    b.Property<Guid>("BookId")
-                        .HasColumnType("uuid");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("OrderItemId"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("BookTitle")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("OrderId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
@@ -278,9 +292,11 @@ namespace Pustaksathi.Data.Migrations
 
             modelBuilder.Entity("Pustaksathi.Model.Application.Members.Orders", b =>
                 {
-                    b.Property<Guid>("OrderId")
+                    b.Property<int>("OrderId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("OrderId"));
 
                     b.Property<string>("ClaimCode")
                         .IsRequired()
@@ -313,8 +329,8 @@ namespace Pustaksathi.Data.Migrations
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("numeric");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("OrderId");
 
@@ -325,15 +341,17 @@ namespace Pustaksathi.Data.Migrations
 
             modelBuilder.Entity("Pustaksathi.Model.Application.Members.WhiteList", b =>
                 {
-                    b.Property<Guid>("WhiteListId")
+                    b.Property<int>("WhiteListId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WhiteListId"));
 
                     b.Property<DateTime?>("AddedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("WhiteListId");
 
@@ -344,18 +362,20 @@ namespace Pustaksathi.Data.Migrations
 
             modelBuilder.Entity("Pustaksathi.Model.Application.Members.WhiteListItems", b =>
                 {
-                    b.Property<Guid>("WhiteListItemId")
+                    b.Property<int>("WhiteListItemId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WhiteListItemId"));
 
                     b.Property<DateTime?>("AddedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("BookId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("BookId")
+                        .HasColumnType("integer");
 
-                    b.Property<Guid>("WhiteListId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("WhiteListId")
+                        .HasColumnType("integer");
 
                     b.HasKey("WhiteListItemId");
 
@@ -368,9 +388,11 @@ namespace Pustaksathi.Data.Migrations
 
             modelBuilder.Entity("Pustaksathi.Model.Shared.Account.Users", b =>
                 {
-                    b.Property<Guid>("UserId")
+                    b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");

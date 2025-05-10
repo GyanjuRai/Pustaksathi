@@ -226,7 +226,7 @@ namespace Pustaksathi.Services.Application.Books
             {
                 int AffectedRow = 0;
 
-                var ExistingBooksList = param.Where(b => b.BookId != Guid.Empty)
+                var ExistingBooksList = param.Where(b => b.BookId != 0)
                     .Select(b => b.BookId)
                     .ToList();
 
@@ -256,10 +256,9 @@ namespace Pustaksathi.Services.Application.Books
                 }
 
                 var NewBooksList = param
-                    .Where(b => b.BookId == Guid.Empty)
+                    .Where(b => b.BookId == 0)
                     .Select(b => new BooksDetails
                     {
-                        BookId = new Guid(),
                         Title = b.Title,
                         Description = b.Description,
                         ISBN = b.ISBN,
@@ -382,9 +381,8 @@ namespace Pustaksathi.Services.Application.Books
         {
             try
             {
-                if (param.ReviewId == Guid.Empty)
+                if (param.ReviewId == 0)
                 {
-                    param.ReviewId = Guid.NewGuid();
                     param.CreatedAt = DateTime.UtcNow;
                     param.ModifiedAt = DateTime.UtcNow;
                     await _context.Reviews.AddAsync(param);
@@ -459,47 +457,7 @@ namespace Pustaksathi.Services.Application.Books
         ///      Helper Functions
         ///===================================
         #region Helper Functions
-        public async Task<BooksDetails?> CreateBooks(BooksDetails param)
-        {
-            BooksDetails? existingBook = await _context.Books
-                .FirstOrDefaultAsync(b => b.ISBN == param.ISBN);
-            if (existingBook != null)
-            {
-                return null;
-            }
-
-            param.BookId = Guid.NewGuid();
-            param.CreatedAt = DateTime.UtcNow;
-            param.ModifiedAt = DateTime.UtcNow;
-            await _context.Books.AddAsync(param);
-            await _context.SaveChangesAsync();
-            return param;
-        }
-
-        public async Task<BooksDetails?> UpdateBooks(BooksDetails param)
-        {
-            BooksDetails? existingBook = await _context.Books
-                .FirstOrDefaultAsync(b => b.BookId == param.BookId);
-            if (existingBook == null)
-            {
-                return null;
-            }
-            existingBook.Title = param.Title;
-            existingBook.Description = param.Description;
-            existingBook.ISBN = param.ISBN;
-            existingBook.Price = param.Price;
-            existingBook.InStock = param.InStock;
-            existingBook.PublishedDate = param.PublishedDate;
-            existingBook.LanguageId = param.LanguageId;
-            existingBook.GenreId = param.GenreId;
-            existingBook.FormatId = param.FormatId;
-            existingBook.AwardId = param.AwardId;
-            existingBook.AuthorId = param.AuthorId;
-            existingBook.ModifiedAt = DateTime.UtcNow;
-            _context.Books.Update(existingBook);
-            await _context.SaveChangesAsync();
-            return existingBook;
-        }
+        
         #endregion
     }
 }
