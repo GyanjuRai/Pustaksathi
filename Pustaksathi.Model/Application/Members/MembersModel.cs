@@ -69,7 +69,7 @@ namespace Pustaksathi.Model.Application.Members
     }
     public record CartItems
     {
-        public Guid CartItemId { get; set; }
+        public Guid CartItemId { get; set; } = new Guid();
         public Guid? CartId { get; set; }
         public Guid BookId { get; set; }
         public string? BookTitle { get; set; }

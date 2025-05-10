@@ -13,6 +13,10 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text;
 using Pustaksathi.Model.Shared.Account;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using Pustaksathi.API.Config;
 
 
 /**  
@@ -157,6 +161,7 @@ builder.Services.AddControllers();
  *         API Versioning
  * ===============================
  */
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerOptions>();
 builder.Services
     .AddApiVersioning(options =>
     {
@@ -186,6 +191,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseRouting();
+
 app.UseCors(AppData.PolicyName);
 
 app.UseHttpsRedirection();
@@ -197,6 +204,7 @@ app.UseEndpoints(endpoints =>
     HubEndpointConventionBuilder hubEndpointConventionBuilder = endpoints.MapHub<OrderHub>("/orderhub")
     .RequireCors(AppData.PolicyName);
 });
+
 
 app.MapControllers();
 

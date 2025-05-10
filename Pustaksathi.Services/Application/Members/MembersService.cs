@@ -46,54 +46,61 @@ namespace Pustaksathi.Services.Application.Members
             }
         }
 
-        public async Task<Orders?> OrderTsk(Orders param) 
+        public async Task<Orders?> OrderTsk(Orders param)
         {
-            try
+            if (param.LoyalityDiscount || await LoyalityDiscountUpdate(param.UserId)) param.TotalAmount -= param.TotalAmount * 0.10m;
+
+            if (param.QuantityDiscount) param.TotalAmount -= param.TotalAmount * 0.05m;
+
+            var bookIds = param.OrderItems.Select(i => i.BookId).ToList();
+            var books = await _context.Books
+                .Where(b => bookIds.Contains(b.BookId))
+                .ToDictionaryAsync(b => b.BookId);
+
+            foreach (var item in param.OrderItems)
             {
-                Orders? response = null;
-                if(param.LoyalityDiscount)
-                {
-                    param.TotalAmount = param.TotalAmount - (param.TotalAmount * 0.1m);
-                }
-                else
-                {
-                    bool res = await LoyalityDiscountUpdate(param.UserId);
-                    if (res) param.TotalAmount = param.TotalAmount - (param.TotalAmount * 0.1m);
-                }
+                if (!books.TryGetValue(item.BookId, out var book) || book.InStock < item.Quantity)
+                    return null;
 
-                if (param.QuantityDiscount) param.TotalAmount = param.TotalAmount - (param.TotalAmount * 0.05m);
-
-                if (param.OrderId == Guid.Empty)
-                {
-                    response = await CreateOrder(param);
-
-                    if(response != null)
-                    {
-                        var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == param.UserId);
-                        if (user != null)
-                        {
-                            await _emailService.SendOrderConfirmationAsync(param, user.FullName, user.Email);
-                        }
-                    }
-                }
-                else
-                {
-                    response = await UpdateOrder(param);
-                    string message = $"Order {param.OrderId.ToString().Substring(0, 6)} has been completed and received successfully!.";
-
-                    if (response != null)
-                    {
-                        await _hub.Clients.All.SendAsync("ReceiveMessage", message);
-                    }
-                }
-
-                return response;
+                book.InStock -= item.Quantity;
             }
-            catch (Exception)
+
+            Orders? response;
+            if (param.OrderId == Guid.Empty)
             {
-                return null;
+                param.ClaimCode = ClaimCodeGenerator();
+                param.OrderDate = DateTime.UtcNow;
+                param.CreatedAt = DateTime.UtcNow;
+                param.ModifiedAt = DateTime.UtcNow;
+
+                await _context.Orders.AddAsync(param);
+                await _context.SaveChangesAsync();
+
+                response = param;
+
+                var user = await _context.Users.FindAsync(param.UserId);
+                if (user != null)
+                    await _emailService.SendOrderConfirmationAsync(param, user.FullName, user.Email);
             }
+            else
+            {
+                var existing = await _context.Orders.FindAsync(param.OrderId);
+                
+                if (existing == null) return null;
+
+                existing.Status = param.Status;
+                existing.ModifiedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+
+                response = existing;
+                var message = $"Order {param.OrderId.ToString().Substring(0, 6)} has been completed and received successfully!.";
+
+                await _hub.Clients.All.SendAsync("ReceiveMessage", message);
+            }
+
+            return response;
         }
+
 
         public async Task<FlagResponse> CancelOrder(OrderIdParam param) 
         {
@@ -247,7 +254,7 @@ namespace Pustaksathi.Services.Application.Members
             try
             {
                 CartItems? response;
-                if (param.CartItems.CartId == null)
+                if (param.CartItems.CartId == Guid.Empty)
                 {
                     Cart cart = new Cart
                     {
@@ -336,26 +343,43 @@ namespace Pustaksathi.Services.Application.Members
             return false;
         }
 
-        public async Task<Orders?> CreateOrder(Orders param) 
-        {
-            param.ClaimCode = ClaimCodeGenerator();
-            param.OrderDate = DateTime.UtcNow;
-            param.CreatedAt = DateTime.UtcNow;
-            param.ModifiedAt = DateTime.UtcNow;
-            await _context.Orders.AddAsync(param);
-            int result = await _context.SaveChangesAsync();
+        //public async Task<Orders?> CreateOrder(Orders param) 
+        //{
+        //    param.ClaimCode = ClaimCodeGenerator();
+        //    param.OrderDate = DateTime.UtcNow;
+        //    param.CreatedAt = DateTime.UtcNow;
+        //    param.ModifiedAt = DateTime.UtcNow;
+        //    await _context.Orders.AddAsync(param);
+        //    int result = await _context.SaveChangesAsync();
 
-            return result > 0 ? param : null;
-        }
+        //    return result > 0 ? param : null;
+        //}
 
-        public async Task<Orders?> UpdateOrder(Orders param) 
-        {
-            param.Status = param.Status;
-            param.ModifiedAt = DateTime.UtcNow;
-            int result = await _context.SaveChangesAsync();
+        //public async Task<Orders?> UpdateOrder(Orders param) 
+        //{
+        //    param.Status = param.Status;
+        //    param.ModifiedAt = DateTime.UtcNow;
 
-            return result > 0 ? param : null;
-        }
+        //    foreach (var item in param.OrderItems)
+        //    {
+        //        var book = await _context.Books
+        //            .FirstOrDefaultAsync(b => b.BookId == item.BookId);
+
+        //        if (book == null)
+        //            throw new InvalidOperationException($"Book {item.BookId} not found.");
+
+        //        if (book.InStock < item.Quantity)
+        //            throw new InvalidOperationException(
+        //                $"Not enough stock for book {book.BookId} – have {book.InStock}, need {item.Quantity}.");
+
+        //        book.InStock -= item.Quantity;
+        //    }
+
+
+        //    int result = await _context.SaveChangesAsync();
+
+        //    return result > 0 ? param : null;
+        //}
 
         public string ClaimCodeGenerator()
         {

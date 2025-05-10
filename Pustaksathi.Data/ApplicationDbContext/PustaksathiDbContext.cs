@@ -149,7 +149,6 @@ namespace Pustaksathi.Data.ApplicationDbContext
                     .HasForeignKey(o => o.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                    tb.HasQueryFilter(tb => !tb.IsCancelled);
                 });
 
             builder.Entity<OrderItems>(
