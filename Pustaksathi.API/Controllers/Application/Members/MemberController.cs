@@ -67,7 +67,7 @@ namespace Pustaksathi.API.Controllers.Application.Members
                     return Ok(new ResponseModel<object>
                     {
                         Type = EnumResponse.Failed.ToString(),
-                        Message = "No Orders Found",
+                        Message = "Order could not be processed. Possible reasons: insufficient stock or invalid order data.",
                         Data = null
                     });
                 }

@@ -12,7 +12,7 @@ namespace Pustaksathi.Interface.Application.Books
         /// Get Book List
         /// </summary>
         /// <returns></returns>
-        public Task<GridResponse<BooksDetails>?> BooksSel(MvReqOptionParam<BookFitlerOptionParam> param);
+        public Task<GridResponse<BooksDetails>?> BooksSel(MvReqOptionParam<BookFilterOptionParam> param);
         /// <summary>
         /// Get one Book Details
         /// </summary>
@@ -40,7 +40,7 @@ namespace Pustaksathi.Interface.Application.Books
         /// Get review list of review
         /// </summary>
         /// <returns></returns>
-        public Task<List<Review>?> ReviewItemsSel(BookIdParam param);
+        public Task<List<ReviewResponse>?> ReviewItemsSel(BookIdParam param);
         /// <summary>
         /// Insert or update review
         /// </summary>
@@ -50,7 +50,7 @@ namespace Pustaksathi.Interface.Application.Books
         /// Delete review
         /// </summary>
         /// <returns></returns>
-        public Task<FlagResponse?> ReviewDel(Review param);
+        public Task<FlagResponse?> ReviewDel(ReviewIdParam param);
         #endregion
     }
 }

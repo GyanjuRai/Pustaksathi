@@ -11,6 +11,7 @@ using Pustaksathi.Model.Shared.Auth;
 using System.IdentityModel.Tokens.Jwt;
 using Pustaksathi.Model.Shared.Param;
 using Pustaksathi.Services.Helper;
+using Pustaksathi.Model.DataModels;
 
 namespace Pustaksathi.Services.Shared.Account
 {
@@ -31,17 +32,19 @@ namespace Pustaksathi.Services.Shared.Account
         {
             try
             {
-                Users? response = await _context.Users.FirstAsync(x => x.Email == param.Email);
+                UserDto? response = await _context.Users.FirstOrDefaultAsync(x => x.Email == param.Email);
                 if (response != null)
                 {
                     if (EncrypDecrypHelper.VerifyPassword(param.PasswordHash, response.PasswordHash))
                     {
+                        AttributeItemDto? attributeResponse = await _context.AttributeItems.FirstOrDefaultAsync(a => a.AttributeItemId == response.RoleId);
+
                         var claims = new List<Claim>
                         {
                             new Claim(JwtRegisteredClaimNames.Sub, response.UserId.ToString()),
                             new Claim(JwtRegisteredClaimNames.Email, response.Email),
                             new Claim("FullName", response.FullName),
-                            new Claim(ClaimTypes.Role, response.RoleId.ToString() ?? "")
+                            new Claim(ClaimTypes.Role, attributeResponse?.ItemValue.ToString() ?? "")
                         };
 
                         JwtAuthResult jwtAuthResult = await _authService.GenerateToken(claims.ToArray());
@@ -59,7 +62,7 @@ namespace Pustaksathi.Services.Shared.Account
                     {
                         return new LoginResponseModel
                         {
-                            UserId = Guid.Empty,
+                            UserId = 0,
                             FullName = "",
                             Email = "",
                             Role = "",
@@ -83,7 +86,7 @@ namespace Pustaksathi.Services.Shared.Account
         {
             try
             {
-               return param.UserId == Guid.Empty 
+               return param.UserId == 0 
                     ? await CreateUser(param) 
                     : await UpdateUser(param);
             }
@@ -98,7 +101,10 @@ namespace Pustaksathi.Services.Shared.Account
         {
             try
             {
-                Users? response = await _context.Users.FirstOrDefaultAsync(x => x.UserId == param.UserId);
+                UserDto? response = await _context.Users.FirstOrDefaultAsync(x => x.UserId == param.UserId);
+                CartDto? cartResponse = await _context.Carts.FirstOrDefaultAsync(c => c.UserId == param.UserId);
+                WhiteListDto? whiteListResponse = await _context.WhiteLists.FirstOrDefaultAsync(w => w.UserId == param.UserId);
+
                 if (response != null)
                 {
                     return new UserInfoResponse
@@ -106,7 +112,10 @@ namespace Pustaksathi.Services.Shared.Account
                         UserId = response.UserId,
                         FullName = response.FullName,
                         Email = response.Email,
-                        Role = response.RoleId.ToString()
+                        Role = response.RoleId.ToString(),
+                        IsDiscountApplied = response.IsDiscountApplied,
+                        CartId = cartResponse?.CartId ?? 0,
+                        WhiteListId = whiteListResponse?.WhiteListId ?? 0
                     };
                 }
                 else
@@ -128,16 +137,24 @@ namespace Pustaksathi.Services.Shared.Account
         public async Task<Users?> CreateUser(Users param)
         {
             param.PasswordHash = param.PasswordHash == null ? "" : EncrypDecrypHelper.Encrypt(param.PasswordHash);
-            var existingUser = await _context.Users.FindAsync(param.Email);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == param.Email); ;
             if (existingUser != null)
             {
                 return null;
             }
 
-            param.UserId = new Guid();
             param.CreatedAt = DateTime.UtcNow;
             param.ModifiedAt = DateTime.UtcNow;
-            await _context.Users.AddAsync(param);
+            var newUser = new UserDto
+            {
+                FullName = param.FullName,
+                Email = param.Email,
+                PasswordHash = param.PasswordHash,
+                RoleId = param.RoleId,
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow
+            };
+            await _context.Users.AddAsync(newUser);
             int result = await _context.SaveChangesAsync();
             return result > 0 ? param: null;
         }
@@ -155,7 +172,18 @@ namespace Pustaksathi.Services.Shared.Account
             existingUser.PasswordHash = param.PasswordHash == null ? "" : EncrypDecrypHelper.Encrypt(param.PasswordHash);
             existingUser.ModifiedAt = DateTime.UtcNow;
             int result = await _context.SaveChangesAsync();
-            return result > 0 ? existingUser : null;
+
+            var response = new Users
+            {
+                UserId = existingUser.UserId,
+                FullName = existingUser.FullName,
+                Email = existingUser.Email,
+                PasswordHash = existingUser.PasswordHash,
+                RoleId = existingUser.RoleId,
+                CreatedAt = existingUser.CreatedAt,
+                ModifiedAt = existingUser.ModifiedAt
+            };
+            return result > 0 ? response : null;
         }
         #endregion
     }

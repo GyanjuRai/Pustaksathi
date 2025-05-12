@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Pustaksathi.Model.Application.Admin;
 using Pustaksathi.Model.Application.Books;
 using Pustaksathi.Model.Application.Members;
+using Pustaksathi.Model.DataModels;
 using Pustaksathi.Model.Shared.Account;
 using Pustaksathi.Model.Shared.Attribute;
 
@@ -15,19 +16,19 @@ namespace Pustaksathi.Data.ApplicationDbContext
         {
         }
 
-        public DbSet<Users> Users { get; set; }
-        public DbSet<AttributeItem> AttributeItems { get; set; }
-        public DbSet<AttributeCategory> AttributeCategories { get; set; }
-        public DbSet<BooksDetails> Books { get; set; }
-        public DbSet<Orders> Orders { get; set; }
-        public DbSet<OrderItems> OrderItems { get; set; }
-        public DbSet<WhiteList> WhiteLists { get; set; }
-        public DbSet<WhiteListItems> WhiteListItems { get; set; }
-        public DbSet<Cart> Carts { get; set; }
-        public DbSet<CartItems> CartItems { get; set; }
-        public DbSet<TimeDiscount> TimeDiscounts { get; set; }
-        public DbSet<Annoucement> Annoucements { get; set; }
-        public DbSet<Review> Reviews { get; set; }
+        public DbSet<UserDto> Users { get; set; }
+        public DbSet<AttributeItemDto> AttributeItems { get; set; }
+        public DbSet<AttributeCategoryDto> AttributeCategories { get; set; }
+        public DbSet<BooksDetailsDto> Books { get; set; }
+        public DbSet<OrdersDto> Orders { get; set; }
+        public DbSet<OrderItemsDto> OrderItems { get; set; }
+        public DbSet<WhiteListDto> WhiteLists { get; set; }
+        public DbSet<WhiteListItemsDto> WhiteListItems { get; set; }
+        public DbSet<CartDto> Carts { get; set; }
+        public DbSet<CartItemsDto> CartItems { get; set; }
+        public DbSet<TimeDiscountDto> TimeDiscounts { get; set; }
+        public DbSet<AnnoucementDto> Annoucements { get; set; }
+        public DbSet<ReviewDto> Reviews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -50,9 +51,13 @@ namespace Pustaksathi.Data.ApplicationDbContext
         {
 
             
-            builder.Entity<AttributeCategory>(entity =>
+            builder.Entity<AttributeCategoryDto>(entity =>
             {
                 entity.HasKey(tb => tb.AttributeCategoryId);
+                entity.Property(tb => tb.AttributeCategoryId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
+
                 entity.Property(tb => tb.CategoryName)
                     .IsRequired()
                     .HasMaxLength(100);
@@ -64,9 +69,12 @@ namespace Pustaksathi.Data.ApplicationDbContext
 
             });
 
-            builder.Entity<AttributeItem>(entity =>
+            builder.Entity<AttributeItemDto>(entity =>
             {
                 entity.HasKey(tb => tb.AttributeItemId);
+                entity.Property(tb => tb.AttributeItemId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                 entity.Property(tb => tb.ItemName)
                  .IsRequired()
@@ -88,14 +96,17 @@ namespace Pustaksathi.Data.ApplicationDbContext
         #region User configuration
         public void UserModelBuilder(ModelBuilder builder)
         {
-            builder.Entity<Users>(
+            builder.Entity<UserDto>(
                 tb =>
                 {
                     tb.HasKey(u => u.UserId);
+                    tb.Property(u => u.UserId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.HasOne(u => u.Role)
                     .WithOne()
-                    .HasForeignKey<Users>(u => u.RoleId)
+                    .HasForeignKey<UserDto>(u => u.RoleId)
                     .OnDelete(DeleteBehavior.Cascade);
 
                     tb.HasAlternateKey(u => u.Email);
@@ -111,17 +122,20 @@ namespace Pustaksathi.Data.ApplicationDbContext
 
         public void BookModelBuilder(ModelBuilder builder)
         {
-            builder.Entity<BooksDetails>(
+            builder.Entity<BooksDetailsDto>(
                 tb =>
                 {
                     tb.HasIndex(b => b.ISBN)
                     .IsUnique();
                 });
 
-            builder.Entity<BooksDetails>(
+            builder.Entity<BooksDetailsDto>(
                 tb =>
                 {
                     tb.HasKey(b => b.BookId);
+                    tb.Property(b => b.BookId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
                 });
         }
         #endregion
@@ -132,10 +146,13 @@ namespace Pustaksathi.Data.ApplicationDbContext
         #region Order configuration
         public void OrderModelBuilder(ModelBuilder builder)
         {
-            builder.Entity<Orders>(
+            builder.Entity<OrdersDto>(
                 tb =>
                 {
                     tb.HasKey(o => o.OrderId);
+                    tb.Property(o => o.OrderId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.Property(tb => tb.Status)
                     .HasMaxLength(50)
@@ -149,13 +166,15 @@ namespace Pustaksathi.Data.ApplicationDbContext
                     .HasForeignKey(o => o.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                    tb.HasQueryFilter(tb => !tb.IsCancelled);
                 });
 
-            builder.Entity<OrderItems>(
+            builder.Entity<OrderItemsDto>(
                 tb =>
                 {
                     tb.HasKey(tb => tb.OrderItemId);
+                    tb.Property(tb => tb.OrderItemId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.HasOne(oi => oi.Order)
                     .WithMany(o => o.OrderItems)
@@ -165,7 +184,7 @@ namespace Pustaksathi.Data.ApplicationDbContext
                     tb.HasOne(oi => oi.Book)
                     .WithMany(b => b.OrderItems)
                     .HasForeignKey(oi => oi.BookId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.Cascade);
                 });
         }
         #endregion
@@ -176,20 +195,26 @@ namespace Pustaksathi.Data.ApplicationDbContext
         #region Cart configuration
         public void CartModelBuilder(ModelBuilder builder)
         {
-            builder.Entity<Cart>(
+            builder.Entity<CartDto>(
                 tb =>
                 {
                     tb.HasKey(tb => tb.CartId);
+                    tb.Property(tb => tb.CartId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.HasOne(tb => tb.User)
                     .WithMany()
                     .HasForeignKey(tb => tb.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
                 });
-            builder.Entity<CartItems>(
+            builder.Entity<CartItemsDto>(
                 tb =>
                 {
                     tb.HasKey(tb => tb.CartItemId);
+                    tb.Property(tb => tb.CartItemId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.HasOne(tb => tb.Cart)
                     .WithMany(c => c.CartItems)
@@ -210,21 +235,28 @@ namespace Pustaksathi.Data.ApplicationDbContext
         #region WhiteList configuration
         public void WhiteListModelBuilder(ModelBuilder builder)
         {
-            builder.Entity<WhiteList>(
+            builder.Entity<WhiteListDto>(
                 tb =>
                 {
                     tb.HasKey(tb => tb.WhiteListId);
-                    
+                    tb.Property(tb => tb.WhiteListId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
+
+
                     tb.HasOne(tb => tb.users)
                     .WithMany()
                     .HasForeignKey(tb => tb.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            builder.Entity<WhiteListItems>(
+            builder.Entity<WhiteListItemsDto>(
                 tb =>
                 {
                     tb.HasKey(tb => tb.WhiteListItemId);
+                    tb.Property(tb => tb.WhiteListItemId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.HasOne(tb => tb.WhiteList)
                     .WithMany(wl => wl.WhiteListItems)
@@ -245,10 +277,13 @@ namespace Pustaksathi.Data.ApplicationDbContext
         #region TimeDiscount configuration
         public void TimeDiscountModelBuilder(ModelBuilder builder)
         {
-            builder.Entity<TimeDiscount>(
+            builder.Entity<TimeDiscountDto>(
                 tb =>
                 {
                     tb.HasKey(tb => tb.DiscountId);
+                    tb.Property(tb => tb.DiscountId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.HasOne(tb => tb.Book)
                     .WithMany(b => b.TimeDiscounts)
@@ -264,10 +299,13 @@ namespace Pustaksathi.Data.ApplicationDbContext
         #region Annoucement configuration
         public void AnnoucementModelBuilder(ModelBuilder builder)
         {
-            builder.Entity<Annoucement>(
+            builder.Entity<AnnoucementDto>(
                 tb =>
                 {
                     tb.HasKey(tb => tb.AnnoucementId);
+                    tb.Property(tb => tb.AnnoucementId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
                 });
         }
         #endregion
@@ -278,10 +316,13 @@ namespace Pustaksathi.Data.ApplicationDbContext
         #region Review configuration
         public void ReviewModelBuilder(ModelBuilder builder)
         {
-            builder.Entity<Review>(
+            builder.Entity<ReviewDto>(
                 tb =>
                 {
                     tb.HasKey(tb => tb.ReviewId);
+                    tb.Property(tb => tb.ReviewId)
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
 
                     tb.HasOne(tb => tb.User)
                     .WithMany()
@@ -289,7 +330,7 @@ namespace Pustaksathi.Data.ApplicationDbContext
                     .OnDelete(DeleteBehavior.Cascade);
 
                     tb.HasOne(tb => tb.Book)
-                    .WithMany(tb => tb.Reviews)
+                    .WithMany()
                     .HasForeignKey(tb => tb.BookId)
                     .OnDelete(DeleteBehavior.Cascade);
                 });

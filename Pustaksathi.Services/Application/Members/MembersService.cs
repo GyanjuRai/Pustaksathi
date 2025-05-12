@@ -6,6 +6,7 @@ using Pustaksathi.Data.ApplicationDbContext;
 using Pustaksathi.Interface.Application.Members;
 using Pustaksathi.Interface.Shared.Email;
 using Pustaksathi.Model.Application.Members;
+using Pustaksathi.Model.DataModels;
 using Pustaksathi.Model.Shared.Param;
 using Pustaksathi.Model.Shared.Response;
 using Pustaksathi.Services.Shared.Hubs;
@@ -36,6 +37,27 @@ namespace Pustaksathi.Services.Application.Members
                 List<Orders>? response = await _context.Orders
                     .Where(o => o.UserId == param.UserId)
                     .Include(o => o.OrderItems)
+                    .Select(List => new Orders
+                    {
+                        OrderId = List.OrderId,
+                        UserId = List.UserId,
+                        ClaimCode = List.ClaimCode,
+                        TotalAmount = List.TotalAmount,
+                        OrderDate = List.OrderDate,
+                        Status = List.Status,
+                        IsCancelled = List.IsCancelled,
+                        CreatedAt = List.CreatedAt,
+                        ModifiedAt = List.ModifiedAt,
+                        OrderItems = List.OrderItems.Select(i => new OrderItems
+                        {
+                            OrderItemId = i.OrderItemId,
+                            OrderId = i.OrderId,
+                            BookId = i.BookId,
+                            BookTitle = i.BookTitle,
+                            Quantity = i.Quantity,
+                            UnitPrice = i.UnitPrice
+                        }).ToList()
+                    })
                     .ToListAsync();
 
                 return response != null && response.Count > 0 ? response : null;
@@ -46,54 +68,108 @@ namespace Pustaksathi.Services.Application.Members
             }
         }
 
-        public async Task<Orders?> OrderTsk(Orders param) 
+        public async Task<Orders?> OrderTsk(Orders param)
         {
-            try
+            if (param.LoyalityDiscount || await LoyalityDiscountUpdate(param.UserId)) param.TotalAmount -= param.TotalAmount * 0.10m;
+
+            if (param.QuantityDiscount) param.TotalAmount -= param.TotalAmount * 0.05m;
+
+            var bookIds = param.OrderItems.Select(i => i.BookId).ToList();
+            var books = await _context.Books
+                .Where(b => bookIds.Contains(b.BookId))
+                .ToDictionaryAsync(b => b.BookId);
+
+            foreach (var item in param.OrderItems)
             {
-                Orders? response = null;
-                if(param.LoyalityDiscount)
-                {
-                    param.TotalAmount = param.TotalAmount - (param.TotalAmount * 0.1m);
-                }
-                else
-                {
-                    bool res = await LoyalityDiscountUpdate(param.UserId);
-                    if (res) param.TotalAmount = param.TotalAmount - (param.TotalAmount * 0.1m);
-                }
+                if (!books.TryGetValue(item.BookId, out var book) || book.InStock < item.Quantity)
+                    return null;
 
-                if (param.QuantityDiscount) param.TotalAmount = param.TotalAmount - (param.TotalAmount * 0.05m);
-
-                if (param.OrderId == Guid.Empty)
-                {
-                    response = await CreateOrder(param);
-
-                    if(response != null)
-                    {
-                        var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == param.UserId);
-                        if (user != null)
-                        {
-                            await _emailService.SendOrderConfirmationAsync(param, user.FullName, user.Email);
-                        }
-                    }
-                }
-                else
-                {
-                    response = await UpdateOrder(param);
-                    string message = $"Order {param.OrderId.ToString().Substring(0, 6)} has been completed and received successfully!.";
-
-                    if (response != null)
-                    {
-                        await _hub.Clients.All.SendAsync("ReceiveMessage", message);
-                    }
-                }
-
-                return response;
+                book.InStock -= item.Quantity;
             }
-            catch (Exception)
+
+            Orders? response;
+            if (param.OrderId == 0)
             {
-                return null;
+
+                param.ClaimCode = ClaimCodeGenerator();
+                param.OrderDate = DateTime.UtcNow;
+                param.CreatedAt = DateTime.UtcNow;
+                param.ModifiedAt = DateTime.UtcNow;
+
+                var newOrder = new OrdersDto
+                {
+                    OrderId = param.OrderId,
+                    UserId = param.UserId,
+                    ClaimCode = ClaimCodeGenerator(),
+                    OrderDate = DateTime.UtcNow,
+                    Status = "Pending",
+                    IsCancelled = false,
+                    TotalAmount = param.TotalAmount,
+                    LoyalityDiscount = param.LoyalityDiscount,
+                    QuantityDiscount = param.QuantityDiscount,
+                    CreatedAt = DateTime.UtcNow,
+                    ModifiedAt = DateTime.UtcNow,
+                };
+
+                foreach(var item in param.OrderItems)
+                {
+                    newOrder.OrderItems.Add(new OrderItemsDto
+                    {
+                        OrderId = item.OrderId,
+                        BookId = item.BookId,
+                        BookTitle = item.BookTitle,
+                        Quantity = item.Quantity,
+                        UnitPrice = item.UnitPrice
+                    });
+                }
+
+                await _context.Orders.AddAsync(newOrder);
+                await _context.SaveChangesAsync();
+
+                param.OrderId = newOrder.OrderId;
+                param.ClaimCode = newOrder.ClaimCode;
+                foreach (var items in newOrder.OrderItems)
+                {
+                    param.OrderItems.ForEach(o => o.OrderItemId = items.OrderItemId);
+                }
+                response = param;
+
+                var user = await _context.Users.FindAsync(param.UserId);
+                if (user != null)
+                    await _emailService.SendOrderConfirmationAsync(param, user.FullName, user.Email);
             }
+            else
+            {
+                var existing = await _context.Orders.FindAsync(param.OrderId);
+                
+                if (existing == null) return null;
+
+                existing.Status = param.Status;
+                existing.ModifiedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+
+                response = new Orders 
+                { 
+                    OrderId = existing.OrderId,
+                    UserId = existing.UserId,
+                    ClaimCode = existing.ClaimCode,
+                    OrderDate = existing.OrderDate,
+                    Status = existing.Status,
+                    IsCancelled = existing.IsCancelled,
+                    TotalAmount = existing.TotalAmount,
+                    LoyalityDiscount = existing.LoyalityDiscount,
+                    QuantityDiscount = existing.QuantityDiscount,
+                    CreatedAt = existing.CreatedAt,
+                    ModifiedAt = existing.ModifiedAt
+                };
+                var message = $"Order {param.OrderId.ToString().Substring(0, 6)} has been completed and received successfully!.";
+
+                await _hub.Clients.All.SendAsync("ReceiveMessage", message);
+            }
+
+            return response;
         }
+
 
         public async Task<FlagResponse> CancelOrder(OrderIdParam param) 
         {
@@ -136,6 +212,19 @@ namespace Pustaksathi.Services.Application.Members
                 List<WhiteList>? response = await _context.WhiteLists
                     .Where(w => w.UserId == param.UserId)
                     .Include(w => w.WhiteListItems)
+                    .Select(List => new WhiteList 
+                    {
+                        WhiteListId = List.WhiteListId,
+                        UserId = List.UserId,
+                        AddedAt = List.AddedAt,
+                        WhiteListItems = List.WhiteListItems.Select(i => new WhiteListItems
+                        {
+                            WhiteListId = i.WhiteListId,
+                            WhiteListItemId = i.WhiteListItemId,
+                            BookId = i.BookId,
+                            AddedAt = i.AddedAt
+                        }).ToList()
+                    })
                     .ToListAsync();
                 return response != null && response.Count > 0 ? response : null;
             }
@@ -149,26 +238,26 @@ namespace Pustaksathi.Services.Application.Members
         {
             try
             {
-                WhiteList? whiteList = await _context.WhiteLists
+                WhiteListDto? whiteList = await _context.WhiteLists
                 .FirstOrDefaultAsync(w => w.UserId == param.UserId);
 
                 if (whiteList == null)
                 {
-                    whiteList = new WhiteList
+                    whiteList = new WhiteListDto
                     {
-                        WhiteListId = new Guid(),
+                        WhiteListId = 0,
                         UserId = param.UserId,
                         AddedAt = DateTime.UtcNow
                     };
+                    
                     await _context.WhiteLists.AddAsync(whiteList);
                     await _context.SaveChangesAsync();
                 }
 
                 foreach (var item in param.WhiteListItems)
                 {
-                    WhiteListItems whiteListItems = new WhiteListItems
+                    WhiteListItemsDto whiteListItems = new WhiteListItemsDto
                     {
-                        WhiteListItemId = Guid.NewGuid(),
                         BookId = item.BookId,
                         WhiteListId = whiteList.WhiteListId,
                         AddedAt = DateTime.UtcNow
@@ -233,7 +322,25 @@ namespace Pustaksathi.Services.Application.Members
                 List<Cart>? response = await _context.Carts
                     .Where(c => c.UserId == param.UserId)
                     .Include(c => c.CartItems)
+                    .Select(List => new Cart
+                    {
+                        CartId = List.CartId,
+                        UserId = List.UserId,
+                        CreatedAt = List.CreatedAt,
+                        CartItems = List.CartItems.Select(i => new CartItems
+                        {
+                            CartItemId = i.CartItemId,
+                            CartId = i.CartId,
+                            BookId = i.BookId,
+                            BookTitle = i.BookTitle,
+                            Quantity = i.Quantity,
+                            TotalPrice = i.TotalPrice,
+                            CreatedAt = i.CreatedAt,
+                            ModifiedAt = i.ModifiedAt
+                        }).ToList()
+                    })
                     .ToListAsync();
+
                 return response != null && response.Count > 0 ? response : null;
             }
             catch (Exception)
@@ -247,22 +354,21 @@ namespace Pustaksathi.Services.Application.Members
             try
             {
                 CartItems? response;
-                if (param.CartItems.CartId == null)
+                if (param.CartItems.CartId == 0)
                 {
-                    Cart cart = new Cart
+                    CartDto cart = new CartDto
                     {
-                        CartId = Guid.NewGuid(),
                         UserId = param.UserId,
-                        CreatedAt = DateTime.UtcNow,
-                        ModifiedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow
                     };
                     await _context.Carts.AddAsync(cart);
-                    param.CartItems.CartId = cart.CartId;
                     await _context.SaveChangesAsync();
+
+                    param.CartItems.CartId = cart.CartId;
                     
                 }
 
-                if(param.CartItems.CartId == Guid.Empty)
+                if(param.CartItems.CartItemId == 0)
                 {
                    response = await CartItemTsk(param.CartItems);
                     return response != null ? new FlagResponse
@@ -323,7 +429,7 @@ namespace Pustaksathi.Services.Application.Members
         // Helper functions   =========
         // ============================
         #region Helper functions
-        public async Task<bool> LoyalityDiscountUpdate(Guid UserId)
+        public async Task<bool> LoyalityDiscountUpdate(int UserId)
         {
             int result = await _context.Orders.CountAsync(o => o.UserId == UserId);
             if (result >= 0)
@@ -336,40 +442,66 @@ namespace Pustaksathi.Services.Application.Members
             return false;
         }
 
-        public async Task<Orders?> CreateOrder(Orders param) 
-        {
-            param.ClaimCode = ClaimCodeGenerator();
-            param.OrderDate = DateTime.UtcNow;
-            param.CreatedAt = DateTime.UtcNow;
-            param.ModifiedAt = DateTime.UtcNow;
-            await _context.Orders.AddAsync(param);
-            int result = await _context.SaveChangesAsync();
+        //public async Task<Orders?> CreateOrder(Orders param) 
+        //{
+        //    param.ClaimCode = ClaimCodeGenerator();
+        //    param.OrderDate = DateTime.UtcNow;
+        //    param.CreatedAt = DateTime.UtcNow;
+        //    param.ModifiedAt = DateTime.UtcNow;
+        //    await _context.Orders.AddAsync(param);
+        //    int result = await _context.SaveChangesAsync();
 
-            return result > 0 ? param : null;
-        }
+        //    return result > 0 ? param : null;
+        //}
 
-        public async Task<Orders?> UpdateOrder(Orders param) 
-        {
-            param.Status = param.Status;
-            param.ModifiedAt = DateTime.UtcNow;
-            int result = await _context.SaveChangesAsync();
+        //public async Task<Orders?> UpdateOrder(Orders param) 
+        //{
+        //    param.Status = param.Status;
+        //    param.ModifiedAt = DateTime.UtcNow;
 
-            return result > 0 ? param : null;
-        }
+        //    foreach (var item in param.OrderItems)
+        //    {
+        //        var book = await _context.Books
+        //            .FirstOrDefaultAsync(b => b.BookId == item.BookId);
+
+        //        if (book == null)
+        //            throw new InvalidOperationException($"Book {item.BookId} not found.");
+
+        //        if (book.InStock < item.Quantity)
+        //            throw new InvalidOperationException(
+        //                $"Not enough stock for book {book.BookId} – have {book.InStock}, need {item.Quantity}.");
+
+        //        book.InStock -= item.Quantity;
+        //    }
+
+
+        //    int result = await _context.SaveChangesAsync();
+
+        //    return result > 0 ? param : null;
+        //}
 
         public string ClaimCodeGenerator()
         {
-            string code = new Guid().ToString("N");
-            string claimCode = code.Substring(0, 7);
+            string code = Guid.NewGuid().ToString("N");
+            string claimCode = code.Substring(0, 7).ToUpper();
             return claimCode;
         }
         
         public async Task<CartItems?> CartItemTsk(CartItems cartItems)
         {
-            cartItems.CartItemId = Guid.NewGuid();
             cartItems.CreatedAt = DateTime.UtcNow;
             cartItems.ModifiedAt = DateTime.UtcNow;
-            await _context.CartItems.AddAsync(cartItems);
+            CartItemsDto newCart = new CartItemsDto
+            {
+                CartId = cartItems.CartId,
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow,
+                BookId = cartItems.BookId,
+                BookTitle = cartItems.BookTitle,
+                Quantity = cartItems.Quantity,
+                TotalPrice = cartItems.Quantity * cartItems.TotalPrice
+            };
+            await _context.CartItems.AddAsync(newCart);
             int result = await _context.SaveChangesAsync();
             return result > 0 ? cartItems : null;
         }

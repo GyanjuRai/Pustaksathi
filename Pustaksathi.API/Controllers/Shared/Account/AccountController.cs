@@ -15,7 +15,6 @@ namespace Pustaksathi.API.Controllers.Shared.Account
     public class AccountController : AuthController
     {
         private readonly IAccountService _accountService;
-        private readonly IAuthService _authService;
 
         public AccountController(
             IAccountService accountService,
@@ -23,12 +22,11 @@ namespace Pustaksathi.API.Controllers.Shared.Account
             )
         {
             _accountService = accountService;
-            _authService = authService;
         }
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] UserLoginParam param)
+        public async Task<IActionResult> Login([FromQuery] UserLoginParam param)
         {
             Log.Information("================================> GET: Login");
             try
@@ -43,7 +41,7 @@ namespace Pustaksathi.API.Controllers.Shared.Account
                         Data = null
                     });
                 }
-                else if (response != null && response.UserId == Guid.Empty)
+                else if (response != null && response.UserId == 0)
                 {
                     return BadRequest(new ResponseModel<object>
                     {
