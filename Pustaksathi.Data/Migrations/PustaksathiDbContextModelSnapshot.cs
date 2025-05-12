@@ -23,7 +23,7 @@ namespace Pustaksathi.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Admin.Annoucement", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.AnnoucementDto", b =>
                 {
                     b.Property<int>("AnnoucementId")
                         .ValueGeneratedOnAdd()
@@ -53,43 +53,59 @@ namespace Pustaksathi.Data.Migrations
                     b.ToTable("Annoucements");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Admin.TimeDiscount", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.AttributeCategoryDto", b =>
                 {
-                    b.Property<int>("DiscountId")
+                    b.Property<int>("AttributeCategoryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DiscountId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AttributeCategoryId"));
 
-                    b.Property<int>("BookId")
-                        .HasColumnType("integer");
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
 
-                    b.Property<decimal>("DiscountPrice")
-                        .HasColumnType("numeric");
+                    b.HasKey("AttributeCategoryId");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("OnSale")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("SaleEndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("SaleStartDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("DiscountId");
-
-                    b.HasIndex("BookId");
-
-                    b.ToTable("TimeDiscounts");
+                    b.ToTable("AttributeCategories");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Books.BooksDetails", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.AttributeItemDto", b =>
+                {
+                    b.Property<int>("AttributeItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AttributeItemId"));
+
+                    b.Property<int>("AttributeCategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("ItemValue")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("AttributeItemId");
+
+                    b.HasIndex("AttributeCategoryId");
+
+                    b.ToTable("AttributeItems");
+                });
+
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.BooksDetailsDto", b =>
                 {
                     b.Property<int>("BookId")
                         .ValueGeneratedOnAdd()
@@ -154,46 +170,7 @@ namespace Pustaksathi.Data.Migrations
                     b.ToTable("Books");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Books.Review", b =>
-                {
-                    b.Property<int>("ReviewId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ReviewId"));
-
-                    b.Property<int>("BookId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ReviewText")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("ReviewId");
-
-                    b.HasIndex("BookId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Reviews");
-                });
-
-            modelBuilder.Entity("Pustaksathi.Model.Application.Members.Cart", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.CartDto", b =>
                 {
                     b.Property<int>("CartId")
                         .ValueGeneratedOnAdd()
@@ -202,9 +179,6 @@ namespace Pustaksathi.Data.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CartId"));
 
                     b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
@@ -217,7 +191,7 @@ namespace Pustaksathi.Data.Migrations
                     b.ToTable("Carts");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Members.CartItems", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.CartItemsDto", b =>
                 {
                     b.Property<int>("CartItemId")
                         .ValueGeneratedOnAdd()
@@ -255,7 +229,7 @@ namespace Pustaksathi.Data.Migrations
                     b.ToTable("CartItems");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Members.OrderItems", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.OrderItemsDto", b =>
                 {
                     b.Property<int>("OrderItemId")
                         .ValueGeneratedOnAdd()
@@ -287,7 +261,7 @@ namespace Pustaksathi.Data.Migrations
                     b.ToTable("OrderItems");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Members.Orders", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.OrdersDto", b =>
                 {
                     b.Property<int>("OrderId")
                         .ValueGeneratedOnAdd()
@@ -336,54 +310,87 @@ namespace Pustaksathi.Data.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Members.WhiteList", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.ReviewDto", b =>
                 {
-                    b.Property<int>("WhiteListId")
+                    b.Property<int>("ReviewId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WhiteListId"));
-
-                    b.Property<DateTime?>("AddedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("WhiteListId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("WhiteLists");
-                });
-
-            modelBuilder.Entity("Pustaksathi.Model.Application.Members.WhiteListItems", b =>
-                {
-                    b.Property<int>("WhiteListItemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WhiteListItemId"));
-
-                    b.Property<DateTime?>("AddedAt")
-                        .HasColumnType("timestamp with time zone");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ReviewId"));
 
                     b.Property<int>("BookId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("WhiteListId")
+                    b.Property<int?>("BooksDetailsDtoBookId")
                         .HasColumnType("integer");
 
-                    b.HasKey("WhiteListItemId");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ReviewText")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ReviewId");
 
                     b.HasIndex("BookId");
 
-                    b.HasIndex("WhiteListId");
+                    b.HasIndex("BooksDetailsDtoBookId");
 
-                    b.ToTable("WhiteListItems");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Reviews");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Shared.Account.Users", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.TimeDiscountDto", b =>
+                {
+                    b.Property<int>("DiscountId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DiscountId"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("DiscountPrice")
+                        .HasColumnType("numeric");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("OnSale")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("SaleEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("SaleStartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("DiscountId");
+
+                    b.HasIndex("BookId");
+
+                    b.ToTable("TimeDiscounts");
+                });
+
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.UserDto", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
@@ -425,91 +432,67 @@ namespace Pustaksathi.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Shared.Attribute.AttributeCategory", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.WhiteListDto", b =>
                 {
-                    b.Property<int>("AttributeCategoryId")
+                    b.Property<int>("WhiteListId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AttributeCategoryId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WhiteListId"));
 
-                    b.Property<string>("CategoryName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                    b.Property<DateTime?>("AddedAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
-                    b.HasKey("AttributeCategoryId");
+                    b.HasKey("WhiteListId");
 
-                    b.ToTable("AttributeCategories");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("WhiteLists");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Shared.Attribute.AttributeItem", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.WhiteListItemsDto", b =>
                 {
-                    b.Property<int>("AttributeItemId")
+                    b.Property<int>("WhiteListItemId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AttributeItemId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WhiteListItemId"));
 
-                    b.Property<int>("AttributeCategoryId")
+                    b.Property<DateTime?>("AddedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("BookId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
+                    b.Property<int>("WhiteListId")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("ItemName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                    b.HasKey("WhiteListItemId");
 
-                    b.Property<string>("ItemValue")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                    b.HasIndex("BookId");
 
-                    b.HasKey("AttributeItemId");
+                    b.HasIndex("WhiteListId");
 
-                    b.HasIndex("AttributeCategoryId");
-
-                    b.ToTable("AttributeItems");
+                    b.ToTable("WhiteListItems");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Admin.TimeDiscount", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.AttributeItemDto", b =>
                 {
-                    b.HasOne("Pustaksathi.Model.Application.Books.BooksDetails", "Book")
-                        .WithMany("TimeDiscounts")
-                        .HasForeignKey("BookId")
+                    b.HasOne("Pustaksathi.Model.DataModels.AttributeCategoryDto", "AttributeCategory")
+                        .WithMany("AttributeItems")
+                        .HasForeignKey("AttributeCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Book");
+                    b.Navigation("AttributeCategory");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Books.Review", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.CartDto", b =>
                 {
-                    b.HasOne("Pustaksathi.Model.Application.Books.BooksDetails", "Book")
-                        .WithMany("Reviews")
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Pustaksathi.Model.Shared.Account.Users", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Book");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Pustaksathi.Model.Application.Members.Cart", b =>
-                {
-                    b.HasOne("Pustaksathi.Model.Shared.Account.Users", "User")
+                    b.HasOne("Pustaksathi.Model.DataModels.UserDto", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -518,15 +501,15 @@ namespace Pustaksathi.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Members.CartItems", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.CartItemsDto", b =>
                 {
-                    b.HasOne("Pustaksathi.Model.Application.Books.BooksDetails", "Book")
+                    b.HasOne("Pustaksathi.Model.DataModels.BooksDetailsDto", "Book")
                         .WithMany("CartItems")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Pustaksathi.Model.Application.Members.Cart", "Cart")
+                    b.HasOne("Pustaksathi.Model.DataModels.CartDto", "Cart")
                         .WithMany("CartItems")
                         .HasForeignKey("CartId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -536,15 +519,15 @@ namespace Pustaksathi.Data.Migrations
                     b.Navigation("Cart");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Members.OrderItems", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.OrderItemsDto", b =>
                 {
-                    b.HasOne("Pustaksathi.Model.Application.Books.BooksDetails", "Book")
+                    b.HasOne("Pustaksathi.Model.DataModels.BooksDetailsDto", "Book")
                         .WithMany("OrderItems")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Pustaksathi.Model.Application.Members.Orders", "Order")
+                    b.HasOne("Pustaksathi.Model.DataModels.OrdersDto", "Order")
                         .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -555,9 +538,9 @@ namespace Pustaksathi.Data.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Members.Orders", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.OrdersDto", b =>
                 {
-                    b.HasOne("Pustaksathi.Model.Shared.Account.Users", "User")
+                    b.HasOne("Pustaksathi.Model.DataModels.UserDto", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -566,9 +549,54 @@ namespace Pustaksathi.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Members.WhiteList", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.ReviewDto", b =>
                 {
-                    b.HasOne("Pustaksathi.Model.Shared.Account.Users", "users")
+                    b.HasOne("Pustaksathi.Model.DataModels.BooksDetailsDto", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Pustaksathi.Model.DataModels.BooksDetailsDto", null)
+                        .WithMany("Reviews")
+                        .HasForeignKey("BooksDetailsDtoBookId");
+
+                    b.HasOne("Pustaksathi.Model.DataModels.UserDto", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.TimeDiscountDto", b =>
+                {
+                    b.HasOne("Pustaksathi.Model.DataModels.BooksDetailsDto", "Book")
+                        .WithMany("TimeDiscounts")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+                });
+
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.UserDto", b =>
+                {
+                    b.HasOne("Pustaksathi.Model.DataModels.AttributeItemDto", "Role")
+                        .WithOne()
+                        .HasForeignKey("Pustaksathi.Model.DataModels.UserDto", "RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.WhiteListDto", b =>
+                {
+                    b.HasOne("Pustaksathi.Model.DataModels.UserDto", "users")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -577,15 +605,15 @@ namespace Pustaksathi.Data.Migrations
                     b.Navigation("users");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Members.WhiteListItems", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.WhiteListItemsDto", b =>
                 {
-                    b.HasOne("Pustaksathi.Model.Application.Books.BooksDetails", "books")
+                    b.HasOne("Pustaksathi.Model.DataModels.BooksDetailsDto", "books")
                         .WithMany("WhiteListItems")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Pustaksathi.Model.Application.Members.WhiteList", "WhiteList")
+                    b.HasOne("Pustaksathi.Model.DataModels.WhiteListDto", "WhiteList")
                         .WithMany("WhiteListItems")
                         .HasForeignKey("WhiteListId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -596,29 +624,12 @@ namespace Pustaksathi.Data.Migrations
                     b.Navigation("books");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Shared.Account.Users", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.AttributeCategoryDto", b =>
                 {
-                    b.HasOne("Pustaksathi.Model.Shared.Attribute.AttributeItem", "Role")
-                        .WithOne()
-                        .HasForeignKey("Pustaksathi.Model.Shared.Account.Users", "RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
+                    b.Navigation("AttributeItems");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Shared.Attribute.AttributeItem", b =>
-                {
-                    b.HasOne("Pustaksathi.Model.Shared.Attribute.AttributeCategory", "AttributeCategory")
-                        .WithMany("AttributeItems")
-                        .HasForeignKey("AttributeCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AttributeCategory");
-                });
-
-            modelBuilder.Entity("Pustaksathi.Model.Application.Books.BooksDetails", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.BooksDetailsDto", b =>
                 {
                     b.Navigation("CartItems");
 
@@ -631,24 +642,19 @@ namespace Pustaksathi.Data.Migrations
                     b.Navigation("WhiteListItems");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Members.Cart", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.CartDto", b =>
                 {
                     b.Navigation("CartItems");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Members.Orders", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.OrdersDto", b =>
                 {
                     b.Navigation("OrderItems");
                 });
 
-            modelBuilder.Entity("Pustaksathi.Model.Application.Members.WhiteList", b =>
+            modelBuilder.Entity("Pustaksathi.Model.DataModels.WhiteListDto", b =>
                 {
                     b.Navigation("WhiteListItems");
-                });
-
-            modelBuilder.Entity("Pustaksathi.Model.Shared.Attribute.AttributeCategory", b =>
-                {
-                    b.Navigation("AttributeItems");
                 });
 #pragma warning restore 612, 618
         }

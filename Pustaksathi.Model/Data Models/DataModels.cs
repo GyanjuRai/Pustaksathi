@@ -1,8 +1,6 @@
 ﻿
 
-using Pustaksathi.Model.Application.Books;
 using Pustaksathi.Model.Shared.Account;
-using Pustaksathi.Model.Shared.Attribute;
 
 namespace Pustaksathi.Model.DataModels
 {
@@ -66,11 +64,6 @@ namespace Pustaksathi.Model.DataModels
         public ICollection<OrderItemsDto> OrderItems { get; init; } = new List<OrderItemsDto>();
         public ICollection<WhiteListItemsDto> WhiteListItems { get; init; } = new List<WhiteListItemsDto>();
         public ICollection<CartItemsDto> CartItems { get; init; } = new List<CartItemsDto>();
-        public ICollection<AttributeItemDto> LanguageAttributes { get; init; } = new List<AttributeItemDto>();
-        public ICollection<AttributeItemDto> GenreAttributes { get; init; } = new List<AttributeItemDto>();
-        public ICollection<AttributeItemDto> FormatAttributes { get; init; } = new List<AttributeItemDto>();
-        public ICollection<AttributeItemDto> AwardAttributes { get; init; } = new List<AttributeItemDto>();
-        public ICollection<AttributeItemDto> AuthorAttributes { get; init; } = new List<AttributeItemDto>();
     }
 
     public class ReviewDto
@@ -83,8 +76,8 @@ namespace Pustaksathi.Model.DataModels
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
         public bool IsDeleted { get; set; } = false;
-        public Users User { get; set; } = null!;
-        public BooksDetails Book { get; set; } = null!;
+        public UserDto User { get; set; } = null!;
+        public BooksDetailsDto Book { get; set; } = null!;
     }
 
     #endregion
@@ -124,7 +117,7 @@ namespace Pustaksathi.Model.DataModels
         public int WhiteListId { get; set; }
         public required int UserId { get; set; }
         public DateTime? AddedAt { get; set; }
-        public Users? users { get; set; }
+        public UserDto? users { get; set; }
         public ICollection<WhiteListItemsDto> WhiteListItems { get; set; } = new List<WhiteListItemsDto>();
     }
 
@@ -143,7 +136,7 @@ namespace Pustaksathi.Model.DataModels
         public int CartId { get; set; }
         public required int UserId { get; set; }
         public DateTime? CreatedAt { get; set; }
-        public Users? User { get; set; }
+        public UserDto? User { get; set; }
         public ICollection<CartItemsDto> CartItems { get; set; } = new List<CartItemsDto>();
     }
     

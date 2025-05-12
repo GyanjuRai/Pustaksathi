@@ -184,7 +184,7 @@ namespace Pustaksathi.Data.ApplicationDbContext
                     tb.HasOne(oi => oi.Book)
                     .WithMany(b => b.OrderItems)
                     .HasForeignKey(oi => oi.BookId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.Cascade);
                 });
         }
         #endregion

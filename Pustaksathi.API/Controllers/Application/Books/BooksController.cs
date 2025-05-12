@@ -58,7 +58,7 @@ namespace Pustaksathi.API.Controllers.Application.Books
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetBookDetails(BookIdParam param) 
+        public async Task<IActionResult> GetBookDetails([FromQuery]BookIdParam param) 
         {
             try
             {
@@ -128,9 +128,8 @@ namespace Pustaksathi.API.Controllers.Application.Books
                 return BadRequest(new ResponseModel<object>
                 {
                     Type = EnumResponse.SomethingWentWrong.ToString(),
-                    Message = "Something went wrong",
+                    Message = ex.Message.ToString(),
                     Data = null,
-                    Exception = ex
                 });
             }
         }
@@ -176,12 +175,12 @@ namespace Pustaksathi.API.Controllers.Application.Books
 
         #region Review
         [HttpGet]
-        public async Task<IActionResult> ReviewItemsSel(BookIdParam param)
+        public async Task<IActionResult> ReviewItemsSel([FromQuery]BookIdParam param)
         {
             try
             {
                 Log.Information("======================================> GET: ReviewItemsSel");
-                List<Review>? result = await _bookService.ReviewItemsSel(param);
+                List<ReviewResponse>? result = await _bookService.ReviewItemsSel(param);
                 if (result == null)
                 {
                     return Ok(new ResponseModel<object>
@@ -191,7 +190,7 @@ namespace Pustaksathi.API.Controllers.Application.Books
                         Data = null
                     });
                 }
-                return Ok(new ResponseModel<List<Review>>
+                return Ok(new ResponseModel<List<ReviewResponse>>
                 {
                     Type = EnumResponse.Success.ToString(),
                     Message = "Review Found",
@@ -284,7 +283,7 @@ namespace Pustaksathi.API.Controllers.Application.Books
         }
 
         [HttpDelete]
-        public async Task<IActionResult> ReviewDel([FromBody] Review param)
+        public async Task<IActionResult> ReviewDel([FromBody]ReviewIdParam param)
         {
             try
             {

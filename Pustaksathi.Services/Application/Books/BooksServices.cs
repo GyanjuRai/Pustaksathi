@@ -306,7 +306,8 @@ namespace Pustaksathi.Services.Application.Books
                 if (NewBooksList.Any())
                 {
                     await _context.Books.AddRangeAsync(NewBooksList);
-                    AffectedRow += NewBooksList.Count;
+                    int result = await _context.SaveChangesAsync();
+                    AffectedRow += result;
                 }
 
                 await transaction.CommitAsync();
@@ -385,35 +386,29 @@ namespace Pustaksathi.Services.Application.Books
             }
         }
 
-        public async Task<List<Review>?> ReviewItemsSel(BookIdParam param)
+        public async Task<List<ReviewResponse>?> ReviewItemsSel(BookIdParam param)
         {
-            try
-            {
-                List<Review>? response = await _context.Reviews
-                    .Where(r => r.BookId == param.BookId)
-                    .Select(List => new Review
-                    {
-                        ReviewId = List.ReviewId,
-                        BookId = List.BookId,
-                        UserId = List.UserId,
-                        Rating = List.Rating,
-                        ReviewText = List.ReviewText,
-                        CreatedAt = List.CreatedAt,
-                        ModifiedAt = List.ModifiedAt,
-                        IsDeleted = List.IsDeleted
-                    })
-                    .ToListAsync();
-                if (response != null && response.Count > 0)
+            var responses = await _context.Reviews
+                .AsNoTracking()
+                .Where(r => r.BookId == param.BookId && !r.IsDeleted)
+                .Include(r => r.User)  
+                .Select(r => new ReviewResponse
                 {
-                    return response;
-                }
-                return null;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+                    ReviewId = r.ReviewId,
+                    BookId = r.BookId,
+                    UserId = r.UserId,
+                    UserName = r.User.FullName,
+                    Rating = r.Rating,
+                    ReviewText = r.ReviewText,
+                    CreatedAt = r.CreatedAt,
+                    ModifiedAt = r.ModifiedAt,
+                    IsDeleted = r.IsDeleted
+                })
+                .ToListAsync();
+
+            return responses;
         }
+
 
         public async Task<FlagResponse?> ReviewTsk(Review param)
         {
@@ -478,13 +473,14 @@ namespace Pustaksathi.Services.Application.Books
             }
         }
 
-        public async Task<FlagResponse?> ReviewDel(Review param)
+        public async Task<FlagResponse?> ReviewDel(ReviewIdParam param)
         {
             try
             {
                 int result = await _context.Reviews
                     .Where(r => r.ReviewId == param.ReviewId)
                     .ExecuteUpdateAsync(r => r.SetProperty(b => b.IsDeleted, true));
+
                 if (result > 0)
                 {
                     return new FlagResponse

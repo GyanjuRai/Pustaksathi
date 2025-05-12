@@ -97,7 +97,11 @@ namespace Pustaksathi.Services.Application.Admin
                     }
                     if (param.Filter.IsDeleted)
                     {
-                        query = query.Where(b => b.IsDeleted == param.Filter.IsDeleted);
+                        query = query.Where(b => b.IsDeleted);
+                    }
+                    else
+                    {
+                        query = query.Where(b => !b.IsDeleted);
                     }
                 }
                 #endregion
@@ -110,11 +114,11 @@ namespace Pustaksathi.Services.Application.Admin
                 {
                     if (param.SortOrder == "asc")
                     {
-                        query = query.OrderBy(b => EF.Property<object>(b, param.SortBy));
+                        query = query.OrderBy(b => EF.Property<TimeDiscountDto>(b, param.SortBy));
                     }
                     else
                     {
-                        query = query.OrderByDescending(b => EF.Property<object>(b, param.SortBy));
+                        query = query.OrderByDescending(b => EF.Property<TimeDiscountDto>(b, param.SortBy));
                     }
                 }
                 #endregion

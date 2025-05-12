@@ -37,12 +37,14 @@ namespace Pustaksathi.Services.Shared.Account
                 {
                     if (EncrypDecrypHelper.VerifyPassword(param.PasswordHash, response.PasswordHash))
                     {
+                        AttributeItemDto? attributeResponse = await _context.AttributeItems.FirstOrDefaultAsync(a => a.AttributeItemId == response.RoleId);
+
                         var claims = new List<Claim>
                         {
                             new Claim(JwtRegisteredClaimNames.Sub, response.UserId.ToString()),
                             new Claim(JwtRegisteredClaimNames.Email, response.Email),
                             new Claim("FullName", response.FullName),
-                            new Claim(ClaimTypes.Role, response.RoleId.ToString() ?? "")
+                            new Claim(ClaimTypes.Role, attributeResponse?.ItemValue.ToString() ?? "")
                         };
 
                         JwtAuthResult jwtAuthResult = await _authService.GenerateToken(claims.ToArray());

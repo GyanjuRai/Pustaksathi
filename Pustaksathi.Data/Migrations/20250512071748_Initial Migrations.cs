@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Pustaksathi.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigartions : Migration
+    public partial class InitialMigrations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -150,8 +150,7 @@ namespace Pustaksathi.Data.Migrations
                     CartId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -204,7 +203,8 @@ namespace Pustaksathi.Data.Migrations
                     ReviewText = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    BooksDetailsDtoBookId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -215,6 +215,11 @@ namespace Pustaksathi.Data.Migrations
                         principalTable: "Books",
                         principalColumn: "BookId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Reviews_Books_BooksDetailsDtoBookId",
+                        column: x => x.BooksDetailsDtoBookId,
+                        principalTable: "Books",
+                        principalColumn: "BookId");
                     table.ForeignKey(
                         name: "FK_Reviews_Users_UserId",
                         column: x => x.UserId,
@@ -375,6 +380,11 @@ namespace Pustaksathi.Data.Migrations
                 name: "IX_Reviews_BookId",
                 table: "Reviews",
                 column: "BookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reviews_BooksDetailsDtoBookId",
+                table: "Reviews",
+                column: "BooksDetailsDtoBookId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reviews_UserId",

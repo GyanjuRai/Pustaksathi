@@ -25,7 +25,6 @@ namespace Pustaksathi.Model.Application.Admin
         public required DateTime SaleStartDate { get; set; }
         public required DateTime SaleEndDate { get; set; }
         public bool? OnSale { get; set; } = false;
-        public BooksDetails Book { get; set; } = null!;
     }
     public record TimeDiscountIdParam
     {

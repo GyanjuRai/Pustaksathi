@@ -100,7 +100,7 @@ namespace Pustaksathi.Services.Application.Members
                 {
                     OrderId = param.OrderId,
                     UserId = param.UserId,
-                    ClaimCode = param.ClaimCode,
+                    ClaimCode = ClaimCodeGenerator(),
                     OrderDate = DateTime.UtcNow,
                     Status = "Pending",
                     IsCancelled = false,
@@ -127,6 +127,7 @@ namespace Pustaksathi.Services.Application.Members
                 await _context.SaveChangesAsync();
 
                 param.OrderId = newOrder.OrderId;
+                param.ClaimCode = newOrder.ClaimCode;
                 foreach (var items in newOrder.OrderItems)
                 {
                     param.OrderItems.ForEach(o => o.OrderItemId = items.OrderItemId);
@@ -481,8 +482,8 @@ namespace Pustaksathi.Services.Application.Members
 
         public string ClaimCodeGenerator()
         {
-            string code = new Guid().ToString("N");
-            string claimCode = code.Substring(0, 7);
+            string code = Guid.NewGuid().ToString("N");
+            string claimCode = code.Substring(0, 7).ToUpper();
             return claimCode;
         }
         

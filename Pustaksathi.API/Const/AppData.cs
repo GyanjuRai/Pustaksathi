@@ -7,7 +7,9 @@
         #region
         public const string PolicyName = "CorsPolicy";
 
-        public const string AdminPolicy = "Admin";
+        public const string AdminPolicy = "ADMIN";
+
+        public const string StaffPolicy = "STAFF";
         #endregion
     }
 }

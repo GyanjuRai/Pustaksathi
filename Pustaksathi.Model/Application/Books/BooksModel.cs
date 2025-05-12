@@ -1,9 +1,5 @@
 ﻿
 
-using Pustaksathi.Model.Application.Admin;
-using Pustaksathi.Model.Application.Books;
-using Pustaksathi.Model.Application.Members;
-using Pustaksathi.Model.Shared.Account;
 
 namespace Pustaksathi.Model.Application.Books
 {
@@ -27,9 +23,9 @@ namespace Pustaksathi.Model.Application.Books
     }
     public record BookFilterOptionParam
     {
-        public required List<int> LanguageAttributeItemList { get; set; }
-        public required List<int> GenreAttributeItemList { get; set; }
-        public required List<int> FormatAttributeItemList { get; set; }
+        public  List<int>? LanguageAttributeItemList { get; set; }
+        public  List<int>? GenreAttributeItemList { get; set; }
+        public  List<int>? FormatAttributeItemList { get; set; }
         public int? AuthorId { get; set; }
 
     }
@@ -49,9 +45,26 @@ namespace Pustaksathi.Model.Application.Books
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
         public bool IsDeleted { get; set; } = false;
-        public BooksDetails Book { get; set; } = null!;
     }
 
+    public record ReviewResponse
+    {
+        public int ReviewId { get; set; }
+        public required int BookId { get; set; }
+        public required int UserId { get; set; }
+        public required string UserName { get; set; }
+        public required int Rating { get; set; }
+        public required string ReviewText { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
+        public bool IsDeleted { get; set; } = false;
+    }
+
+    public record ReviewIdParam
+    {
+        public required int ReviewId { get; set; }
+
+    }
 
     public record CheckReviewParam
     {

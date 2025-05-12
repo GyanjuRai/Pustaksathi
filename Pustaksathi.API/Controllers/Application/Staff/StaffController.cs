@@ -1,5 +1,7 @@
 ﻿using E2_Dynamics.Model.Shared.Enum;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Pustaksathi.API.Const;
 using Pustaksathi.API.Controllers.Shared.Auth;
 using Pustaksathi.Interface.Application.Staff;
 using Pustaksathi.Model.Application.Members;
@@ -18,6 +20,7 @@ namespace Pustaksathi.API.Controllers.Application.Staff
         }
 
         [HttpGet]
+        [Authorize(Roles = AppData.StaffPolicy)]
         public async Task<IActionResult> CheckClaimCode([FromQuery] OrderClaimCodeParam param)
         {
             Log.Information("===============================> GET: CheckClaimCode");
