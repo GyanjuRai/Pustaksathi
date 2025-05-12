@@ -20,12 +20,25 @@ namespace Pustaksathi.Services.Shared.Attribute
             try
             {
                 string categoryName = param.CategoryName.Trim().ToLower();
-                List<AttributeItem> response = await _context.AttributeCategories
-                                                        .Include(x => x.AttributeItems)
+                var response = await _context.AttributeCategories
                                                         .Where(x => x.CategoryName.ToLower() == categoryName)
                                                         .SelectMany(x => x.AttributeItems)
                                                         .ToListAsync();
-                return response;
+                if (response == null || !response.Any())
+                {
+                    return null;
+                }
+
+                List<AttributeItem> attributeItems = response.Select(item => new AttributeItem
+                {
+                    AttributeItemId = item.AttributeItemId,
+                    AttributeCategoryId = item.AttributeCategoryId,
+                    ItemName = item.ItemName,
+                    ItemValue = item.ItemValue,
+                    Description = item.Description
+                }).ToList();
+
+                return attributeItems;
             }
             catch (Exception)
             {

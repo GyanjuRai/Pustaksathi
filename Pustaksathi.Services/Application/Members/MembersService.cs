@@ -6,6 +6,7 @@ using Pustaksathi.Data.ApplicationDbContext;
 using Pustaksathi.Interface.Application.Members;
 using Pustaksathi.Interface.Shared.Email;
 using Pustaksathi.Model.Application.Members;
+using Pustaksathi.Model.DataModels;
 using Pustaksathi.Model.Shared.Param;
 using Pustaksathi.Model.Shared.Response;
 using Pustaksathi.Services.Shared.Hubs;
@@ -36,6 +37,27 @@ namespace Pustaksathi.Services.Application.Members
                 List<Orders>? response = await _context.Orders
                     .Where(o => o.UserId == param.UserId)
                     .Include(o => o.OrderItems)
+                    .Select(List => new Orders
+                    {
+                        OrderId = List.OrderId,
+                        UserId = List.UserId,
+                        ClaimCode = List.ClaimCode,
+                        TotalAmount = List.TotalAmount,
+                        OrderDate = List.OrderDate,
+                        Status = List.Status,
+                        IsCancelled = List.IsCancelled,
+                        CreatedAt = List.CreatedAt,
+                        ModifiedAt = List.ModifiedAt,
+                        OrderItems = List.OrderItems.Select(i => new OrderItems
+                        {
+                            OrderItemId = i.OrderItemId,
+                            OrderId = i.OrderId,
+                            BookId = i.BookId,
+                            BookTitle = i.BookTitle,
+                            Quantity = i.Quantity,
+                            UnitPrice = i.UnitPrice
+                        }).ToList()
+                    })
                     .ToListAsync();
 
                 return response != null && response.Count > 0 ? response : null;
@@ -68,14 +90,47 @@ namespace Pustaksathi.Services.Application.Members
             Orders? response;
             if (param.OrderId == 0)
             {
+
                 param.ClaimCode = ClaimCodeGenerator();
                 param.OrderDate = DateTime.UtcNow;
                 param.CreatedAt = DateTime.UtcNow;
                 param.ModifiedAt = DateTime.UtcNow;
 
-                await _context.Orders.AddAsync(param);
+                var newOrder = new OrdersDto
+                {
+                    OrderId = param.OrderId,
+                    UserId = param.UserId,
+                    ClaimCode = param.ClaimCode,
+                    OrderDate = DateTime.UtcNow,
+                    Status = "Pending",
+                    IsCancelled = false,
+                    TotalAmount = param.TotalAmount,
+                    LoyalityDiscount = param.LoyalityDiscount,
+                    QuantityDiscount = param.QuantityDiscount,
+                    CreatedAt = DateTime.UtcNow,
+                    ModifiedAt = DateTime.UtcNow,
+                };
+
+                foreach(var item in param.OrderItems)
+                {
+                    newOrder.OrderItems.Add(new OrderItemsDto
+                    {
+                        OrderId = item.OrderId,
+                        BookId = item.BookId,
+                        BookTitle = item.BookTitle,
+                        Quantity = item.Quantity,
+                        UnitPrice = item.UnitPrice
+                    });
+                }
+
+                await _context.Orders.AddAsync(newOrder);
                 await _context.SaveChangesAsync();
 
+                param.OrderId = newOrder.OrderId;
+                foreach (var items in newOrder.OrderItems)
+                {
+                    param.OrderItems.ForEach(o => o.OrderItemId = items.OrderItemId);
+                }
                 response = param;
 
                 var user = await _context.Users.FindAsync(param.UserId);
@@ -92,7 +147,20 @@ namespace Pustaksathi.Services.Application.Members
                 existing.ModifiedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
 
-                response = existing;
+                response = new Orders 
+                { 
+                    OrderId = existing.OrderId,
+                    UserId = existing.UserId,
+                    ClaimCode = existing.ClaimCode,
+                    OrderDate = existing.OrderDate,
+                    Status = existing.Status,
+                    IsCancelled = existing.IsCancelled,
+                    TotalAmount = existing.TotalAmount,
+                    LoyalityDiscount = existing.LoyalityDiscount,
+                    QuantityDiscount = existing.QuantityDiscount,
+                    CreatedAt = existing.CreatedAt,
+                    ModifiedAt = existing.ModifiedAt
+                };
                 var message = $"Order {param.OrderId.ToString().Substring(0, 6)} has been completed and received successfully!.";
 
                 await _hub.Clients.All.SendAsync("ReceiveMessage", message);
@@ -143,6 +211,19 @@ namespace Pustaksathi.Services.Application.Members
                 List<WhiteList>? response = await _context.WhiteLists
                     .Where(w => w.UserId == param.UserId)
                     .Include(w => w.WhiteListItems)
+                    .Select(List => new WhiteList 
+                    {
+                        WhiteListId = List.WhiteListId,
+                        UserId = List.UserId,
+                        AddedAt = List.AddedAt,
+                        WhiteListItems = List.WhiteListItems.Select(i => new WhiteListItems
+                        {
+                            WhiteListId = i.WhiteListId,
+                            WhiteListItemId = i.WhiteListItemId,
+                            BookId = i.BookId,
+                            AddedAt = i.AddedAt
+                        }).ToList()
+                    })
                     .ToListAsync();
                 return response != null && response.Count > 0 ? response : null;
             }
@@ -156,23 +237,25 @@ namespace Pustaksathi.Services.Application.Members
         {
             try
             {
-                WhiteList? whiteList = await _context.WhiteLists
+                WhiteListDto? whiteList = await _context.WhiteLists
                 .FirstOrDefaultAsync(w => w.UserId == param.UserId);
 
                 if (whiteList == null)
                 {
-                    whiteList = new WhiteList
+                    whiteList = new WhiteListDto
                     {
+                        WhiteListId = 0,
                         UserId = param.UserId,
                         AddedAt = DateTime.UtcNow
                     };
+                    
                     await _context.WhiteLists.AddAsync(whiteList);
                     await _context.SaveChangesAsync();
                 }
 
                 foreach (var item in param.WhiteListItems)
                 {
-                    WhiteListItems whiteListItems = new WhiteListItems
+                    WhiteListItemsDto whiteListItems = new WhiteListItemsDto
                     {
                         BookId = item.BookId,
                         WhiteListId = whiteList.WhiteListId,
@@ -238,7 +321,25 @@ namespace Pustaksathi.Services.Application.Members
                 List<Cart>? response = await _context.Carts
                     .Where(c => c.UserId == param.UserId)
                     .Include(c => c.CartItems)
+                    .Select(List => new Cart
+                    {
+                        CartId = List.CartId,
+                        UserId = List.UserId,
+                        CreatedAt = List.CreatedAt,
+                        CartItems = List.CartItems.Select(i => new CartItems
+                        {
+                            CartItemId = i.CartItemId,
+                            CartId = i.CartId,
+                            BookId = i.BookId,
+                            BookTitle = i.BookTitle,
+                            Quantity = i.Quantity,
+                            TotalPrice = i.TotalPrice,
+                            CreatedAt = i.CreatedAt,
+                            ModifiedAt = i.ModifiedAt
+                        }).ToList()
+                    })
                     .ToListAsync();
+
                 return response != null && response.Count > 0 ? response : null;
             }
             catch (Exception)
@@ -254,11 +355,10 @@ namespace Pustaksathi.Services.Application.Members
                 CartItems? response;
                 if (param.CartItems.CartId == 0)
                 {
-                    Cart cart = new Cart
+                    CartDto cart = new CartDto
                     {
                         UserId = param.UserId,
-                        CreatedAt = DateTime.UtcNow,
-                        ModifiedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow
                     };
                     await _context.Carts.AddAsync(cart);
                     await _context.SaveChangesAsync();
@@ -390,7 +490,17 @@ namespace Pustaksathi.Services.Application.Members
         {
             cartItems.CreatedAt = DateTime.UtcNow;
             cartItems.ModifiedAt = DateTime.UtcNow;
-            await _context.CartItems.AddAsync(cartItems);
+            CartItemsDto newCart = new CartItemsDto
+            {
+                CartId = cartItems.CartId,
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow,
+                BookId = cartItems.BookId,
+                BookTitle = cartItems.BookTitle,
+                Quantity = cartItems.Quantity,
+                TotalPrice = cartItems.Quantity * cartItems.TotalPrice
+            };
+            await _context.CartItems.AddAsync(newCart);
             int result = await _context.SaveChangesAsync();
             return result > 0 ? cartItems : null;
         }

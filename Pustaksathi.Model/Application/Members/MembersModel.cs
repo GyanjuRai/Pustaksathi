@@ -19,8 +19,7 @@ namespace Pustaksathi.Model.Application.Members
         public decimal TotalAmount { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
-        public Users User { get; set; } = null!;
-        public IReadOnlyCollection<OrderItems> OrderItems { get; set; } = new List<OrderItems>();
+        public List<OrderItems> OrderItems { get; set; } = new List<OrderItems>();
     }
 
     public record OrderItems
@@ -31,8 +30,6 @@ namespace Pustaksathi.Model.Application.Members
         public string? BookTitle { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
-        public Orders Order { get; set; } = null!;
-        public BooksDetails Book { get; set; } = null!;
     }
     #endregion
 
@@ -43,7 +40,7 @@ namespace Pustaksathi.Model.Application.Members
         public required int UserId { get; set; }
         public DateTime? AddedAt { get; set; }
         public Users? users { get; set; }
-        public ICollection<WhiteListItems> WhiteListItems { get; set; } = new List<WhiteListItems>();
+        public List<WhiteListItems> WhiteListItems { get; set; } = new List<WhiteListItems>();
     }
 
     public record WhiteListItems
@@ -52,8 +49,6 @@ namespace Pustaksathi.Model.Application.Members
         public required int WhiteListId { get; set; }
         public required int BookId { get; set; }
         public DateTime? AddedAt { get; set; }
-        public BooksDetails books { get; set; } = null!;
-        public WhiteList WhiteList { get; set; } = null!;
     }
     #endregion
 
@@ -63,9 +58,7 @@ namespace Pustaksathi.Model.Application.Members
         public int CartId { get; set; }
         public required int UserId { get; set; }
         public DateTime? CreatedAt { get; set; }
-        public DateTime? ModifiedAt { get; set; }
-        public Users User { get; set; } = null!;
-        public IReadOnlyCollection<CartItems> CartItems { get; set; } = new List<CartItems>();
+        public List<CartItems> CartItems { get; set; } = new List<CartItems>();
     }
     public record CartItems
     {
@@ -77,8 +70,6 @@ namespace Pustaksathi.Model.Application.Members
         public decimal TotalPrice { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
-        public Cart Cart { get; set; } = null!;
-        public BooksDetails Book { get; set; } = null!;
     }
 
     #endregion

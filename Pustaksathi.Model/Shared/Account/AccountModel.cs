@@ -14,7 +14,6 @@ namespace Pustaksathi.Model.Shared.Account
         public bool? IsDiscountApplied { get; set; } = false;
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
-        public AttributeItem? Role { get; set; }
     }
 
     public record UserLoginParam
@@ -29,5 +28,8 @@ namespace Pustaksathi.Model.Shared.Account
         public string? FullName { get; set; }
         public string? Email { get; set; }
         public string? Role { get; set; }
+        public bool? IsDiscountApplied { get; set; } = false;
+        public int? WhiteListId { get; set; }
+        public int? CartId { get; set; }
     }
 }

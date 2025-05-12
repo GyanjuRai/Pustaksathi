@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Pustaksathi.Data.ApplicationDbContext;
 using Pustaksathi.Interface.Application.Books;
 using Pustaksathi.Model.Application.Books;
+using Pustaksathi.Model.DataModels;
 using Pustaksathi.Model.Shared.Param;
 using Pustaksathi.Model.Shared.Response;
 using System.Net.WebSockets;
@@ -19,7 +20,7 @@ namespace Pustaksathi.Services.Application.Books
             _context = context;
         }
         #region Book Core Service
-        public async Task<GridResponse<BooksDetails>?> BooksSel(MvReqOptionParam<BookFitlerOptionParam> param)
+        public async Task<GridResponse<BooksDetails>?> BooksSel(MvReqOptionParam<BookFilterOptionParam> param)
         {
             try
             {
@@ -82,35 +83,14 @@ namespace Pustaksathi.Services.Application.Books
                             break;
 
                         case "deals":
-                            query = from b in _context.Books
-                                    join d in _context.TimeDiscounts
-                                    on b.BookId equals d.BookId into DiscountGroup
-                                    let latest = DiscountGroup
-                                    .Where(d => !d.IsDeleted)
-                                    .OrderByDescending(d => d.SaleStartDate)
-                                    .FirstOrDefault()
-                                    select new BooksDetails
-                                    {
-                                        BookId = b.BookId,
-                                        Title = b.Title,
-                                        Description = b.Description,
-                                        ISBN = b.ISBN,
-                                        Price = b.Price,
-                                        InStock = b.InStock,
-                                        PublishedDate = b.PublishedDate,
-                                        LanguageId = b.LanguageId,
-                                        GenreId = b.GenreId,
-                                        FormatId = b.FormatId,
-                                        AwardId = b.AwardId,
-                                        AuthorId = b.AuthorId,
-                                        CreatedAt = b.CreatedAt,
-                                        ModifiedAt = b.ModifiedAt,
-                                        DiscountPrice = (latest != null 
-                                        && latest.OnSale
-                                         && latest.SaleStartDate <= DateTime.UtcNow
-                                        && latest.SaleEndDate >= DateTime.UtcNow)
-                                        ? latest.DiscountPrice : null
-                                    };
+                            query = query
+                                .Where(b => _context.TimeDiscounts.Any(d =>
+                                d.BookId == b.BookId
+                                && d.OnSale == true
+                                && d.IsDeleted == false
+                                && d.SaleStartDate <= DateTime.UtcNow
+                                && d.SaleEndDate >= DateTime.UtcNow
+                                ));
                             break;
 
                         default:
@@ -188,6 +168,35 @@ namespace Pustaksathi.Services.Application.Books
                 var items = await query
                     .Skip(param.OffSet)
                     .Take(param.PageSize)
+                    .Select(List => new BooksDetails 
+                    {
+                        BookId = List.BookId,
+                        Title = List.Title,
+                        Description = List.Description,
+                        ISBN = List.ISBN,
+                        Price = List.Price,
+                        InStock = List.InStock,
+                        PublishedDate = List.PublishedDate,
+                        LanguageId = List.LanguageId,
+                        GenreId = List.GenreId,
+                        FormatId = List.FormatId,
+                        AwardId = List.AwardId,
+                        AuthorId = List.AuthorId,
+                        CreatedAt = List.CreatedAt,
+                        ModifiedAt = List.ModifiedAt,
+                        DiscountPrice = _context.TimeDiscounts
+                        .Where(d =>
+                            d.BookId == List.BookId
+                            && d.OnSale == true
+                            && !d.IsDeleted
+                            && d.SaleStartDate <= DateTime.UtcNow
+                            && d.SaleEndDate >= DateTime.UtcNow
+                        )
+                        .OrderByDescending(d => d.SaleStartDate)
+                        .Select(d => (decimal?)d.DiscountPrice)
+                        .FirstOrDefault()
+
+                    })
                     .ToListAsync();
                 #endregion
 
@@ -208,9 +217,27 @@ namespace Pustaksathi.Services.Application.Books
         {
             try
             {
-                BooksDetails? response = await _context.Books.FirstOrDefaultAsync(b => b.BookId == param.BookId);
+                BooksDetailsDto? response = await _context.Books
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(b => b.BookId == param.BookId);
 
-                return response != null ? response : null;
+                return response != null ? new BooksDetails 
+                {
+                    BookId = response.BookId,
+                    Title = response.Title,
+                    Description = response.Description,
+                    ISBN = response.ISBN,
+                    Price = response.Price,
+                    InStock = response.InStock,
+                    PublishedDate = response.PublishedDate,
+                    LanguageId = response.LanguageId,
+                    GenreId = response.GenreId,
+                    FormatId = response.FormatId,
+                    AwardId = response.AwardId,
+                    AuthorId = response.AuthorId,
+                    CreatedAt = response.CreatedAt,
+                    ModifiedAt = response.ModifiedAt
+                } : null;
             }
             catch (Exception)
             {
@@ -257,7 +284,7 @@ namespace Pustaksathi.Services.Application.Books
 
                 var NewBooksList = param
                     .Where(b => b.BookId == 0)
-                    .Select(b => new BooksDetails
+                    .Select(b => new BooksDetailsDto
                     {
                         Title = b.Title,
                         Description = b.Description,
@@ -364,6 +391,17 @@ namespace Pustaksathi.Services.Application.Books
             {
                 List<Review>? response = await _context.Reviews
                     .Where(r => r.BookId == param.BookId)
+                    .Select(List => new Review
+                    {
+                        ReviewId = List.ReviewId,
+                        BookId = List.BookId,
+                        UserId = List.UserId,
+                        Rating = List.Rating,
+                        ReviewText = List.ReviewText,
+                        CreatedAt = List.CreatedAt,
+                        ModifiedAt = List.ModifiedAt,
+                        IsDeleted = List.IsDeleted
+                    })
                     .ToListAsync();
                 if (response != null && response.Count > 0)
                 {
@@ -385,12 +423,26 @@ namespace Pustaksathi.Services.Application.Books
                 {
                     param.CreatedAt = DateTime.UtcNow;
                     param.ModifiedAt = DateTime.UtcNow;
-                    await _context.Reviews.AddAsync(param);
+                    param.IsDeleted = false;
+
+                    var newReview = new ReviewDto
+                    {
+                        BookId = param.BookId,
+                        UserId = param.UserId,
+                        Rating = param.Rating,
+                        ReviewText = param.ReviewText,
+                        CreatedAt = param.CreatedAt,
+                        ModifiedAt = param.ModifiedAt,
+                        IsDeleted = param.IsDeleted
+                    };
+
+                    await _context.Reviews.AddAsync(newReview);
                 }
                 else
                 {
-                    Review? existingReview = await _context.Reviews
+                    ReviewDto? existingReview = await _context.Reviews
                         .FirstOrDefaultAsync(r => r.ReviewId == param.ReviewId);
+
                     if (existingReview == null)
                     {
                         return new FlagResponse

@@ -14,8 +14,7 @@ namespace Pustaksathi.Model.Application.Admin
         public bool OnSale { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public bool IsDeleted { get; set; } = false;
-
-        public BooksDetails Book { get; set; } = null!;
+        public string BookTitle { get; set; } = string.Empty;
     }
 
     public record TimeDiscountParam

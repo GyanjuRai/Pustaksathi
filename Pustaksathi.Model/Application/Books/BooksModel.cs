@@ -24,13 +24,8 @@ namespace Pustaksathi.Model.Application.Books
         public required int AuthorId { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
-        public ICollection<TimeDiscount> TimeDiscounts { get; init; } = new List<TimeDiscount>();
-        public ICollection<Review> Reviews { get; init; } = new List<Review>();
-        public ICollection<OrderItems> OrderItems { get; init; } = new List<OrderItems>();
-        public ICollection<WhiteListItems> WhiteListItems { get; init; } = new List<WhiteListItems>();
-        public ICollection<CartItems> CartItems { get; init; } = new List<CartItems>();
     }
-    public record BookFitlerOptionParam
+    public record BookFilterOptionParam
     {
         public required List<int> LanguageAttributeItemList { get; set; }
         public required List<int> GenreAttributeItemList { get; set; }
@@ -54,7 +49,6 @@ namespace Pustaksathi.Model.Application.Books
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
         public bool IsDeleted { get; set; } = false;
-        public Users User { get; set; } = null!;
         public BooksDetails Book { get; set; } = null!;
     }
 

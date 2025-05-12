@@ -22,7 +22,7 @@ namespace Pustaksathi.API.Controllers.Application.Books
 
         #region Book Core Endpoints
         [HttpGet]
-        public async Task<IActionResult> BooksSel([FromQuery] MvReqOptionParam<BookFitlerOptionParam> param)
+        public async Task<IActionResult> BooksSel([FromQuery] MvReqOptionParam<BookFilterOptionParam> param)
         {
             try
             {

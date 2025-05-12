@@ -5,6 +5,7 @@ using MimeKit.Encodings;
 using Pustaksathi.Data.ApplicationDbContext;
 using Pustaksathi.Interface.Application.Admin;
 using Pustaksathi.Model.Application.Admin;
+using Pustaksathi.Model.DataModels;
 using Pustaksathi.Model.Shared.Param;
 using Pustaksathi.Model.Shared.Response;
 
@@ -40,7 +41,7 @@ namespace Pustaksathi.Services.Application.Admin
                         };
                     }
 
-                    await _context.TimeDiscounts.AddAsync(new TimeDiscount
+                    await _context.TimeDiscounts.AddAsync(new TimeDiscountDto
                     {
                         BookId = param.BookId,
                         DiscountPrice = param.DiscountPrice,
@@ -124,9 +125,39 @@ namespace Pustaksathi.Services.Application.Admin
                 #region Pagination
                 int totalCount = await query.CountAsync();
                 var items = await query
-                    .Skip(param.OffSet)
-                    .Take(param.PageSize)
-                    .ToListAsync();
+                .Join(
+                    _context.Books,
+                    discount => discount.BookId,
+                    book => book.BookId,
+                    (discount, book) => new
+                    {
+                        discount.DiscountId,
+                        discount.BookId,
+                        discount.DiscountPrice,
+                        discount.SaleStartDate,
+                        discount.SaleEndDate,
+                        discount.OnSale,
+                        discount.CreatedAt,
+                        discount.IsDeleted,
+                        BookTitle = book.Title
+                    }
+                )
+                .Skip(param.OffSet)
+                .Take(param.PageSize)
+                .Select(joined => new TimeDiscount
+                {
+                    DiscountId = joined.DiscountId,
+                    BookId = joined.BookId,
+                    DiscountPrice = joined.DiscountPrice,
+                    SaleStartDate = joined.SaleStartDate,
+                    SaleEndDate = joined.SaleEndDate,
+                    OnSale = joined.OnSale,
+                    CreatedAt = joined.CreatedAt,
+                    IsDeleted = joined.IsDeleted,
+                    BookTitle = joined.BookTitle
+                })
+                .ToListAsync();
+
                 #endregion
 
                 return new GridResponse<TimeDiscount>
@@ -199,6 +230,15 @@ namespace Pustaksathi.Services.Application.Admin
                 var items = await query
                     .Skip(param.OffSet)
                     .Take(param.PageSize)
+                    .Select(List => new Annoucement
+                    {
+                        AnnoucementId = List.AnnoucementId,
+                        Title = List.Title,
+                        Message = List.Message,
+                        ImageUrl = List.ImageUrl,
+                        StartDate = List.StartDate,
+                        EndDate = List.EndDate
+                    })
                     .ToListAsync();
                 #endregion
 
@@ -222,7 +262,7 @@ namespace Pustaksathi.Services.Application.Admin
             {
                 if (param.AnnoucementId == 0)
                 {
-                    await _context.Annoucements.AddAsync(new Annoucement
+                    await _context.Annoucements.AddAsync(new AnnoucementDto
                     {
                         Title = param.Title,
                         Message = param.Message,
@@ -289,6 +329,15 @@ namespace Pustaksathi.Services.Application.Admin
             {
                 List<Annoucement> response = await _context.Annoucements
                     .Where(a => a.StartDate <= DateTime.UtcNow && a.EndDate >= DateTime.UtcNow)
+                    .Select(List => new Annoucement
+                    {
+                        AnnoucementId = List.AnnoucementId,
+                        Title = List.Title,
+                        Message = List.Message,
+                        ImageUrl = List.ImageUrl,
+                        StartDate = List.StartDate,
+                        EndDate = List.EndDate
+                    })
                     .ToListAsync();
 
                 return response;

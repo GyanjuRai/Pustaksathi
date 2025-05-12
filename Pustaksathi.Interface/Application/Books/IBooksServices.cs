@@ -12,7 +12,7 @@ namespace Pustaksathi.Interface.Application.Books
         /// Get Book List
         /// </summary>
         /// <returns></returns>
-        public Task<GridResponse<BooksDetails>?> BooksSel(MvReqOptionParam<BookFitlerOptionParam> param);
+        public Task<GridResponse<BooksDetails>?> BooksSel(MvReqOptionParam<BookFilterOptionParam> param);
         /// <summary>
         /// Get one Book Details
         /// </summary>
