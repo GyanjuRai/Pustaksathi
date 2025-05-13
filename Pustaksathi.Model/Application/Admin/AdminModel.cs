@@ -8,7 +8,7 @@ namespace Pustaksathi.Model.Application.Admin
     {
         public int DiscountId { get; set; }
         public required int BookId { get; set; }
-        public decimal DiscountPrice { get; set; }
+        public decimal DiscountPercent { get; set; }
         public DateTime SaleStartDate { get; set; }
         public DateTime SaleEndDate { get; set; }
         public bool OnSale { get; set; }
@@ -21,7 +21,7 @@ namespace Pustaksathi.Model.Application.Admin
     {
         public required int DiscountId { get; set; }
         public required int BookId { get; set; }
-        public required decimal DiscountPrice { get; set; }
+        public required decimal DiscountPercent { get; set; }
         public required DateTime SaleStartDate { get; set; }
         public required DateTime SaleEndDate { get; set; }
         public bool? OnSale { get; set; } = false;

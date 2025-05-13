@@ -51,7 +51,7 @@ namespace Pustaksathi.Model.DataModels
         public required decimal Price { get; set; }
         public required int InStock { get; set; }
         public required DateOnly PublishedDate { get; set; }
-        public decimal? DiscountPrice { get; set; }
+        public decimal? DiscountPercent { get; set; }
         public required List<int> LanguageId { get; set; }
         public required List<int> GenreId { get; set; }
         public required List<int> FormatId { get; set; }
@@ -160,7 +160,7 @@ namespace Pustaksathi.Model.DataModels
     {
         public int DiscountId { get; set; }
         public required int BookId { get; set; }
-        public decimal DiscountPrice { get; set; }
+        public decimal DiscountPercent { get; set; }
         public DateTime SaleStartDate { get; set; }
         public DateTime SaleEndDate { get; set; }
         public bool OnSale { get; set; }
