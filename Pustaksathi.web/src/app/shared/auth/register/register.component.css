@@ -1,0 +1,257 @@
+
+    .signup-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      background-color: var(--background-light);
+    }
+
+    .signup-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -1;
+      background-image: radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%));
+      background-repeat: no-repeat;
+    }
+
+    [data-theme="dark"] .signup-container::before {
+      background-image: radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%));
+    }
+
+    @media (min-width: 600px) {
+      .signup-container {
+        padding: 32px;
+      }
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      align-self: center;
+      width: 100%;
+      max-width: 450px;
+      padding: 32px;
+      gap: 16px;
+      margin: auto;
+      background-color: #ffffff; 
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 50px;
+      box-shadow: var(--card-shadow-light);
+    }
+
+    [data-theme="dark"] .card {
+      background-color: #ffffff; 
+      border-color: rgba(255, 255, 255, 0.12);
+      box-shadow: var(--card-shadow-dark);
+    }
+
+    .sitemark-icon {
+      width: 40px;
+      height: 40px;
+      background-color: var(--primary-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 10vw, 2.15rem);
+      font-weight: 500;
+      width: 100%;
+      margin: 0;
+    }
+
+    .form-control {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .password-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 48px 12px 16px;
+      font-size: 1rem;
+      border: 1px solid rgba(0, 0, 0, 0.23);
+      border-radius: 50px;
+      background-color: #ffffff; 
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .password-toggle-icon {
+        position: absolute;
+        right: 16px;          
+        top: 60% !important;
+        transform: translateY(-50%);
+        cursor: pointer;
+        font-size: 20px;       
+        color: rgba(0, 0, 0, 0.54);
+    }
+
+    [data-theme="dark"] input[type="text"],
+    [data-theme="dark"] input[type="email"],
+    [data-theme="dark"] input[type="password"] {
+      border-color: rgba(255, 255, 255, 0.23);
+      background-color: #ffffff; /* keep inputs white */
+    }
+
+    input:focus {
+      border-color: var(--primary-color);
+    }
+
+    input.error {
+      border-color: var(--error-color);
+    }
+
+    .helper-text {
+      font-size: 0.75rem;
+      color: var(--error-color);
+      margin-top: 4px;
+    }
+
+    .checkbox-label {
+      font-size: 1rem;
+      color: var(--text-primary);
+    }
+
+    .button {
+      padding: 12px 32px;
+      font-size: 1rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      width: 100%;
+      background-color: #1565c0;
+      color: #ffffff;
+    }
+
+    .button-outlined {
+      background-color: transparent;
+      border: 1px solid rgba(0, 0, 0, 0.23);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+      border-radius: 50px;
+    }
+
+    [data-theme="dark"] .button-outlined {
+      border-color: rgba(255, 255, 255, 0.23);
+    }
+
+    .button-outlined:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    [data-theme="dark"] .button-outlined:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 16px 0;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background-color: rgba(0, 0, 0, 0.12);
+    }
+
+    [data-theme="dark"] .divider-line {
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .divider-text {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .social-icon {
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .link {
+      color: #1565c0;
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+
+    .link:hover {
+      text-decoration: underline;
+    }
+
+    .color-mode-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      padding: 8px;
+      background-color: var(--background-light);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 50px;
+      cursor: pointer;
+    }
+
+    [data-theme="dark"] .color-mode-toggle {
+      background-color: var(--background-dark);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .social-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .text-center {
+      text-align: center;
+      font-size: 0.875rem;
+    }
+
+    .password-toggle-icon {
+        position: absolute;
+        right: 12px;      
+        top: 80%;
+        transform: translateY(-50%);
+        cursor: pointer;
+    }

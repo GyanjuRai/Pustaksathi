@@ -1,0 +1,22 @@
+.custom-snackbar-panel {
+  padding: 4px !important;
+  margin: 0 !important;
+  border: 1px solid #ccc !important;
+  background-color: #fff !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+}
+
+.custom-snackbar-panel .mat-simple-snackbar {
+  padding: 0 !important;
+  margin: 0 !important;
+
+}
+
+.custom-snackbar-panel .mat-snack-bar-container {
+  display: inline-flex !important;
+  align-items: center;
+  padding: 0 !important;
+  margin: 0 !important;
+}

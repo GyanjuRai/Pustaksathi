@@ -309,7 +309,7 @@ namespace Pustaksathi.API.Controllers.Application.Members
         }
 
         [HttpDelete]
-        public  async Task<IActionResult> CartItemDel(CartItemsIdParam param)
+        public  async Task<IActionResult> CartItemDel([FromBody] CartItemsIdParam param)
         {
             try
             {
