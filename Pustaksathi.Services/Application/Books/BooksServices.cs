@@ -184,7 +184,7 @@ namespace Pustaksathi.Services.Application.Books
                         AuthorId = List.AuthorId,
                         CreatedAt = List.CreatedAt,
                         ModifiedAt = List.ModifiedAt,
-                        DiscountPrice = _context.TimeDiscounts
+                        DiscountPercent = _context.TimeDiscounts
                         .Where(d =>
                             d.BookId == List.BookId
                             && d.OnSale == true
@@ -193,7 +193,7 @@ namespace Pustaksathi.Services.Application.Books
                             && d.SaleEndDate >= DateTime.UtcNow
                         )
                         .OrderByDescending(d => d.SaleStartDate)
-                        .Select(d => (decimal?)d.DiscountPrice)
+                        .Select(d => (decimal?)d.DiscountPercent)
                         .FirstOrDefault()
 
                     })

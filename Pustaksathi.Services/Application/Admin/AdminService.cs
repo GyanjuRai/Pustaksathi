@@ -44,7 +44,7 @@ namespace Pustaksathi.Services.Application.Admin
                     await _context.TimeDiscounts.AddAsync(new TimeDiscountDto
                     {
                         BookId = param.BookId,
-                        DiscountPrice = param.DiscountPrice,
+                        DiscountPercent = param.DiscountPercent,
                         SaleStartDate = param.SaleStartDate,
                         SaleEndDate = param.SaleEndDate,
                         OnSale = param.OnSale ?? false
@@ -57,7 +57,7 @@ namespace Pustaksathi.Services.Application.Admin
                     result = await _context.TimeDiscounts
                     .Where(b => b.DiscountId == param.DiscountId)
                     .ExecuteUpdateAsync(b => b
-                                            .SetProperty(b => b.DiscountPrice, param.DiscountPrice)
+                                            .SetProperty(b => b.DiscountPercent, param.DiscountPercent)
                                             .SetProperty(b => b.OnSale, param.OnSale)
                                             .SetProperty(b => b.SaleStartDate, param.SaleStartDate)
                                             .SetProperty(b => b.SaleEndDate, param.SaleEndDate));
@@ -137,7 +137,7 @@ namespace Pustaksathi.Services.Application.Admin
                     {
                         discount.DiscountId,
                         discount.BookId,
-                        discount.DiscountPrice,
+                        discount.DiscountPercent,
                         discount.SaleStartDate,
                         discount.SaleEndDate,
                         discount.OnSale,
@@ -152,7 +152,7 @@ namespace Pustaksathi.Services.Application.Admin
                 {
                     DiscountId = joined.DiscountId,
                     BookId = joined.BookId,
-                    DiscountPrice = joined.DiscountPrice,
+                    DiscountPercent = joined.DiscountPercent,
                     SaleStartDate = joined.SaleStartDate,
                     SaleEndDate = joined.SaleEndDate,
                     OnSale = joined.OnSale,
