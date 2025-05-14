@@ -53,7 +53,7 @@ namespace Pustaksathi.Services.Shared.Account
                             UserId = response.UserId,
                             FullName = response.FullName,
                             Email = response.Email,
-                            Role = response.RoleId.ToString(),
+                            Role = attributeResponse?.ItemValue.ToString() ?? "",
                             Token = jwtAuthResult.Token ?? "",
                             RefreshToken = jwtAuthResult.RefreshToken ?? ""
                         };

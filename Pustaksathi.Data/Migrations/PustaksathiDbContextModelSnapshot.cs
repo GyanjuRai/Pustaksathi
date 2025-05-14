@@ -120,6 +120,9 @@ namespace Pustaksathi.Data.Migrations
                         .IsRequired()
                         .HasColumnType("integer[]");
 
+                    b.Property<string>("BookImage")
+                        .HasColumnType("text");
+
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -127,7 +130,7 @@ namespace Pustaksathi.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal?>("DiscountPrice")
+                    b.Property<decimal?>("DiscountPercent")
                         .HasColumnType("numeric");
 
                     b.PrimitiveCollection<List<int>>("FormatId")
@@ -368,7 +371,7 @@ namespace Pustaksathi.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("DiscountPrice")
+                    b.Property<decimal>("DiscountPercent")
                         .HasColumnType("numeric");
 
                     b.Property<bool>("IsDeleted")
@@ -524,7 +527,7 @@ namespace Pustaksathi.Data.Migrations
                     b.HasOne("Pustaksathi.Model.DataModels.BooksDetailsDto", "Book")
                         .WithMany("OrderItems")
                         .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Pustaksathi.Model.DataModels.OrdersDto", "Order")

@@ -46,6 +46,7 @@ namespace Pustaksathi.Model.DataModels
     {
         public int BookId { get; set; }
         public required string Title { get; set; }
+        public string? BookImage { get; set; }
         public required string Description { get; set; }
         public required string ISBN { get; set; }
         public required decimal Price { get; set; }

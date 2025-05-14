@@ -146,7 +146,7 @@ namespace Pustaksathi.Services.Application.Admin
                         BookTitle = book.Title
                     }
                 )
-                .Skip(param.OffSet)
+                .Skip(param.Offset)
                 .Take(param.PageSize)
                 .Select(joined => new TimeDiscount
                 {
@@ -232,7 +232,7 @@ namespace Pustaksathi.Services.Application.Admin
                 #region Pagination
                 int totalCount = await query.CountAsync();
                 var items = await query
-                    .Skip(param.OffSet)
+                    .Skip(param.Offset)
                     .Take(param.PageSize)
                     .Select(List => new Annoucement
                     {

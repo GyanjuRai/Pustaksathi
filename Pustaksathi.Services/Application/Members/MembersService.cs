@@ -162,7 +162,7 @@ namespace Pustaksathi.Services.Application.Members
                     CreatedAt = existing.CreatedAt,
                     ModifiedAt = existing.ModifiedAt
                 };
-                var message = $"Order {param.OrderId.ToString().Substring(0, 6)} has been completed and received successfully!.";
+                var message = $"Order {param.OrderId.ToString()} has been completed and received successfully!.";
 
                 await _hub.Clients.All.SendAsync("ReceiveMessage", message);
             }

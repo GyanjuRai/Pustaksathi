@@ -120,15 +120,15 @@ namespace Pustaksathi.Services.Application.Books
 
                 if (param.Filter != null)
                 {
-                    if (param.Filter.LanguageAttributeItemList != null && param.Filter.LanguageAttributeItemList.Count > 0)
+                    if (param.Filter.LanguageAttributeItemList != null && param.Filter.LanguageAttributeItemList.Any())
                     {
                         query = query.Where(b => b.LanguageId.Any(l => param.Filter.LanguageAttributeItemList.Contains(l)));
                     }
-                    if (param.Filter.GenreAttributeItemList != null && param.Filter.GenreAttributeItemList.Count > 0)
+                    if (param.Filter.GenreAttributeItemList != null && param.Filter.GenreAttributeItemList.Any())
                     {
                         query = query.Where(b => b.GenreId.Any(g => param.Filter.GenreAttributeItemList.Contains(g)));
                     }
-                    if (param.Filter.FormatAttributeItemList != null && param.Filter.FormatAttributeItemList.Count > 0)
+                    if (param.Filter.FormatAttributeItemList != null && param.Filter.FormatAttributeItemList.Any())
                     {
                         query = query.Where(b => b.FormatId.Any(f => param.Filter.FormatAttributeItemList.Contains(f)));
                     }
@@ -165,14 +165,15 @@ namespace Pustaksathi.Services.Application.Books
                 #region Pagination
 
                 int totalCount = await query.CountAsync();
-                var items = await query
-                    .Skip(param.OffSet)
+                List<BooksDetails> items = await query
+                    .Skip(param.Offset)
                     .Take(param.PageSize)
                     .Select(List => new BooksDetails 
                     {
                         BookId = List.BookId,
                         Title = List.Title,
                         Description = List.Description,
+                        BookImage = List.BookImage,
                         ISBN = List.ISBN,
                         Price = List.Price,
                         InStock = List.InStock,
@@ -226,6 +227,7 @@ namespace Pustaksathi.Services.Application.Books
                     BookId = response.BookId,
                     Title = response.Title,
                     Description = response.Description,
+                    BookImage = response.BookImage,
                     ISBN = response.ISBN,
                     Price = response.Price,
                     InStock = response.InStock,
@@ -253,34 +255,43 @@ namespace Pustaksathi.Services.Application.Books
             {
                 int AffectedRow = 0;
 
-                var ExistingBooksList = param.Where(b => b.BookId != 0)
-                    .Select(b => b.BookId)
-                    .ToList();
+                var existingIds = param
+                .Where(b => b.BookId != 0)
+                .Select(b => b.BookId)
+                .ToList();
 
-                if (ExistingBooksList.Any())
+                if (existingIds.Any())
                 {
-                    var LookUp = await _context.Books
-                        .Where(b => ExistingBooksList.Contains(b.BookId))
+                    var lookup = await _context.Books
+                        .Where(b => existingIds.Contains(b.BookId))
                         .ToDictionaryAsync(b => b.BookId);
 
-                    int updatedRow = await _context.Books
-                        .Where(b => ExistingBooksList.Contains(b.BookId))
-                        .ExecuteUpdateAsync(b => b
-                        .SetProperty(c => c.Title, c => LookUp[c.BookId].Title)
-                        .SetProperty(b => b.Description, c => LookUp[c.BookId].Description)
-                        .SetProperty(b => b.ISBN, c => LookUp[c.BookId].ISBN)
-                        .SetProperty(b => b.Price, c => LookUp[c.BookId].Price)
-                        .SetProperty(b => b.InStock, c => LookUp[c.BookId].InStock)
-                        .SetProperty(b => b.PublishedDate, c => LookUp[c.BookId].PublishedDate)
-                        .SetProperty(b => b.LanguageId, c => LookUp[c.BookId].LanguageId)
-                        .SetProperty(b => b.GenreId, c => LookUp[c.BookId].GenreId)
-                        .SetProperty(b => b.FormatId, c => LookUp[c.BookId].FormatId)
-                        .SetProperty(b => b.AwardId, c => LookUp[c.BookId].AwardId)
-                        .SetProperty(b => b.AuthorId, c => LookUp[c.BookId].AuthorId)
-                        .SetProperty(b => b.ModifiedAt, c => DateTime.UtcNow)
-                        );
-                    AffectedRow += updatedRow;
+                    var books = await _context.Books
+                        .Where(b => existingIds.Contains(b.BookId))
+                        .ToListAsync();
+
+                    foreach (var book in books)
+                    {
+                        var src = lookup[book.BookId];
+                        book.Title = src.Title;
+                        book.Description = src.Description;
+                        book.BookImage = src.BookImage;
+                        book.ISBN = src.ISBN;
+                        book.Price = src.Price;
+                        book.InStock = src.InStock;
+                        book.PublishedDate = src.PublishedDate;
+                        book.LanguageId = src.LanguageId;
+                        book.GenreId = src.GenreId;
+                        book.FormatId = src.FormatId;
+                        book.AwardId = src.AwardId;
+                        book.AuthorId = src.AuthorId;
+                        book.ModifiedAt = DateTime.UtcNow;
+                    }
+
+                    int affected = await _context.SaveChangesAsync();
+                    AffectedRow += affected;
                 }
+
 
                 var NewBooksList = param
                     .Where(b => b.BookId == 0)
@@ -288,6 +299,7 @@ namespace Pustaksathi.Services.Application.Books
                     {
                         Title = b.Title,
                         Description = b.Description,
+                        BookImage = b.BookImage,
                         ISBN = b.ISBN,
                         Price = b.Price,
                         InStock = b.InStock,

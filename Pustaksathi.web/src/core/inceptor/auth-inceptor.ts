@@ -25,9 +25,7 @@ export class AuthInceptor implements HttpInterceptor {
         req: HttpRequest<any>,
         next: HttpHandler
       ): Observable<HttpEvent<any>> {
-        return next.handle(req).pipe(
-          
-        );
+        return next.handle(req);
       }
 
     getRequestWithHeaders(req: HttpRequest<any>): any {

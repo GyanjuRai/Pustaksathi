@@ -9,71 +9,61 @@ import { BlockUI, NgBlockUI } from 'ng-block-ui';
 })
 export class WebApiService {
 
-    @BlockUI() blockUi!: NgBlockUI;
-    apiUrl: string;
+    private apiUrl: string;
+    // accessToken : string = "";
 
     constructor(private http: HttpClient) {
         this.apiUrl = `${AppConst?.data?.apiBaseUrl}`;
     }
 
+
     get(url: string, param?: object, nestedParam = false, showLoader = false, refresh = true): Observable<any> {
         
-        if(showLoader && !this.blockUi.isActive) {
-            this.blockUi.start();
-        }
-
         let params = {};
         if(nestedParam) {
-            this.buildHtppParams(params, param, '');
-        } else
-        {
+            this.buildHttpParams(params, param, '');
+        } else {
             params = param as HttpParams;
         }
-
-        return this.http.get(`${this.apiUrl}${url}`, { params: params, withCredentials: true }).pipe(
+        
+        return this.http.get(`${this.apiUrl}${url}`, { params: params, withCredentials: true}).pipe(
             delay(100),
             retry(0),
-            map(response => this.returnResponse(response, showLoader)),
-            catchError((error) => {
-
-                if(this.blockUi.isActive) this.blockUi.stop();
-
-                return of(error);
-            })
-        );
+            // map(response => retur)
+        )
     }
 
-    private buildHtppParams(params: any, data: any, currentPath: string) {
+    private buildHttpParams(params: any, data: any, currentPath: string) {
         Object.keys(data).forEach(key => {
-            if(data[key] instanceof Object && !(data[key] instanceof Array)) {
-                this.buildHtppParams(params, data[key], `${currentPath}${key}.`);
-            } else {
-                params[`${currentPath}${key}}`] = data[key];
-            }
+          if (data[key] instanceof Object && !(data[key] instanceof Array)) {
+            this.buildHttpParams(params, data[key], `${currentPath}${key}.`);
+          } else {
+            params[`${currentPath}${key}`] = data[key];
+          }
         });
-    }
+      }
+    
 
     post(url: string, param?: object, showLoader = false): Observable<any> {
-
-        if(showLoader && !this.blockUi.isActive) this.blockUi.start();
+        
+        // if (showLoader && blockui)-- I will implement block UI
 
         return this.http.post(`${this.apiUrl}${url}`, param as HttpParams).pipe(
             delay(100),
             retry(0),
-            map((response: any) => this.returnResponse(response, showLoader)),
-            catchError((error) => {
+            // map(response => )
+        )
 
-                if(this.blockUi.isActive) this.blockUi.stop();
-
-                return of(error);
-            })
-        );
     }
 
-    private returnResponse(value: any, showLoader: boolean = true): any {
 
-        if(showLoader && !this.blockUi.isActive) this.blockUi.reset();
 
-        return value;
-    }
+    // private returnResponse(value: any, showLoader: boolean = true): any {
+
+    //     if (showLoader && this.blockUI.isActive) {
+    //       this.blockUI.reset();
+    //     }
+    
+    //     return value;
+    //   }
 }

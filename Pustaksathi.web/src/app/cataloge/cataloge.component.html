@@ -1,0 +1,87 @@
+<header>
+    <div class="container">
+        <nav>
+            <div class="logo">PustakSathi</div>
+            <div class="nav-links">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#catalog">Book Catalog</a></li>
+                    <li><a href="#order">Order</a></li>
+                </ul>
+                <div class="nav-icons">
+                    <i class="fas fa-shopping-cart"></i>
+                    <div class="profile-circle">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <a href="#" class="logout-icon"><i class="fas fa-sign-out-alt"></i></a>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<section class="filter-section">
+    <div class="container">
+        <div class="filter-container">
+
+            <div class="filter-group">
+                <label for="genre">Genre</label>
+                <select id="genre" [(ngModel)]="gridConfig.option.filter.genreAttributeItemList"
+                    (change)="onFilterChange()">
+                    <option value="">All Genres</option>
+                    <option *ngFor="let genre of genreAttributeItemList" [value]="genre.attributeItemId">
+                        {{ genre.itemName }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="language">Language</label>
+                <select id="language" [(ngModel)]="gridConfig.option.filter.languageAttributeItemList"
+                    (change)="onFilterChange()">
+                    <option value="">All Languages</option>
+                    <option *ngFor="let language of languageAttributeItemList" [value]="language.attributeItemId">
+                        {{ language.itemName }}
+                    </option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="format">Format</label>
+                <select id="format" [(ngModel)]="gridConfig.option.filter.formatAttributeItemList"
+                    (change)="onFilterChange()">
+                    <option value="">All Formats</option>
+                    <option *ngFor="let format of formatAttributeItemList" [value]="format.attributeItemId">
+                        {{ format.itemName }}
+                    </option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button (click)="resetFilters()">Reset Filters</button>
+            </div>
+
+            <div class="search-bar">
+                <input type="text" id="search" [(ngModel)]="gridConfig.option.searchText"
+                    placeholder="Search by Title, ISBN, or description" (keyup.enter)="getBooks()">
+                <button (click)="getBooks()"><i class="fas fa-search"></i> Search</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="featured-books">
+    <div class="container">
+        <div class="books-grid">
+            <div class="book-card" *ngFor="let book of gridConfig.dataSource.data">
+                <img [src]="book.bookImage" alt="Book Cover">
+                <div class="book-info">
+                    <h4>{{ book.title }}</h4>
+                    <p class="description">{{ book.description }}</p>
+                    <p class="price">Rs {{ book.price }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<mat-paginator [length]="gridConfig.dataSource.totalRows" [pageSizeOptions]="pageSizeOptions"
+    [pageSize]="gridConfig.option.pageSize" (page)="onPageChange($event)">
+</mat-paginator>

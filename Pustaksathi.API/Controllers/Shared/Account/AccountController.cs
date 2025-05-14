@@ -24,9 +24,9 @@ namespace Pustaksathi.API.Controllers.Shared.Account
             _accountService = accountService;
         }
 
-        [HttpGet]
+        [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromQuery] UserLoginParam param)
+        public async Task<IActionResult> Login([FromBody] UserLoginParam param)
         {
             Log.Information("================================> GET: Login");
             try
@@ -43,7 +43,7 @@ namespace Pustaksathi.API.Controllers.Shared.Account
                 }
                 else if (response != null && response.UserId == 0)
                 {
-                    return BadRequest(new ResponseModel<object>
+                    return Ok(new ResponseModel<object>
                     {
                         Type = EnumResponse.Failed.ToString(),
                         Message = "Invalid login credentials",
@@ -65,7 +65,7 @@ namespace Pustaksathi.API.Controllers.Shared.Account
                 return BadRequest(new ResponseModel<object>
                 {
                     Type = EnumResponse.SomethingWentWrong.ToString(),
-                    Message = "Error",
+                    Message = "Server Problem",
                     Data = null
                 });
             }
@@ -81,10 +81,10 @@ namespace Pustaksathi.API.Controllers.Shared.Account
                 Users? response = await _accountService.UserTsk(param);
                 if (response == null)
                 {
-                    return BadRequest(new ResponseModel<object>
+                    return Ok(new ResponseModel<object>
                     {
                         Type = EnumResponse.Failed.ToString(),
-                        Message = "User not found",
+                        Message = "User Already Exist",
                         Data = null
                     });
                 }

@@ -22,6 +22,7 @@ namespace Pustaksathi.API.Controllers.Application.Books
 
         #region Book Core Endpoints
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> BooksSel([FromQuery] MvReqOptionParam<BookFilterOptionParam> param)
         {
             try
@@ -97,6 +98,7 @@ namespace Pustaksathi.API.Controllers.Application.Books
         #region POST
         [HttpPost]
         [Authorize(Roles = AppData.AdminPolicy)]
+
         public async Task<IActionResult> BooksTsk([FromBody] List<BooksDetails> param)
         {
             try

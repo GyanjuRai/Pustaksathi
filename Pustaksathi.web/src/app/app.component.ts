@@ -10,16 +10,7 @@ import { Observable } from 'rxjs';
 export class AppComponent {
 
   constructor(private api: WebApiService){
-    this.getData();
   }
 
-  async getData()
-  {
-    await this.api.get('Account/GetAccountDetails')
-    .subscribe((response) => {
-      console.log(response.message);
-    })
-  }
-
-  title = 'Pustaksathi.web';
+  title = 'Pustaksathi';
 }
