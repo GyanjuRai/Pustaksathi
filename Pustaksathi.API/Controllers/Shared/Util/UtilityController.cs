@@ -1,4 +1,5 @@
 ﻿using E2_Dynamics.Model.Shared.Enum;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pustaksathi.API.Controllers.Shared.Auth;
 using Pustaksathi.Interface.Shared.Attribute;
@@ -17,6 +18,7 @@ namespace Pustaksathi.API.Controllers.Shared.Util
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> AttributeItemsGetById([FromQuery] AttributeCategoryParam param)
         {
             try

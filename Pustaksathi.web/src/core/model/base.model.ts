@@ -23,7 +23,7 @@ export interface MvReqOptionParam<T> {
 
 export interface GridResponse<T> {
     totalRows: number;
-    data?: T[];
+    data: T[];
 }
 
 export interface FlagResponse {

@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
 
     if(!this.auth.isAuthenticated()){
-      this.getUserInfo()
+      this.getUserInfo();
     }
   }
 

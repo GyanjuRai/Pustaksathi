@@ -10,10 +10,18 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
 import { SnackbarModule } from './shared/components/snackbar/snackbar.module';
 import { SharedModule } from './shared/shared.module';
+import { HomeComponent } from './home/home.component';
+import { CatalogeComponent } from './cataloge/cataloge.component';
+import {MatPaginatorModule} from '@angular/material/paginator';
+import { FormsModule } from '@angular/forms';
+import { BookDetailComponent } from './book-detail/book-detail.component';
 
 @NgModule({
   declarations: [
     AppComponent,
+    HomeComponent,
+    CatalogeComponent,
+    BookDetailComponent,
   ],
   imports: [
     CommonModule,
@@ -23,6 +31,8 @@ import { SharedModule } from './shared/shared.module';
     RouterModule.forRoot(appRoutes),
     SnackbarModule,
     SharedModule,
+    MatPaginatorModule,
+    FormsModule,
   ],
   providers: [
     AppConst,

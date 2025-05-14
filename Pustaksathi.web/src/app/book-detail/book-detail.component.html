@@ -1,0 +1,146 @@
+<header>
+    <div class="container">
+        <nav>
+            <div class="logo">PustakSathi</div>
+            <div class="nav-links">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#catalog">Book Catalog</a></li>
+                    <li><a href="#order">Order</a></li>
+                </ul>
+                <div class="nav-icons">
+                    <i class="fas fa-shopping-cart"></i>
+                    <div class="profile-circle">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <a href="#" class="logout-icon"><i class="fas fa-sign-out-alt"></i></a>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<div class="breadcrumb">
+</div>
+<div class="book-container">
+    <div class="book-image">
+        <!-- <img [src]="bookDetail?.bookImage" alt="{{ bookDetail?.title }}" /> -->
+    </div>
+    <div class="content">
+        <!-- <h1 class="book-title">{{ bookDetail?.title }}</h1>
+        <p class="book-description">{{ bookDetail?.description }}</p>
+        <p class="book-isbn"><strong>ISBN:</strong> {{ bookDetail?.ISBN }}</p>
+        <p class="book-price"><strong>Price:</strong> Rs {{ bookDetail?.price }}</p>
+        <p class="book-stock"><strong>In Stock:</strong> {{ bookDetail?.inStock }}</p>
+        <p class="book-published-date"><strong>Published Date:</strong> {{ bookDetail?.publishedDate | date }}</p>
+        <p class="book-discount"><strong>Discount:</strong> {{ bookDetail?.discountPercent }}%</p>
+        <p class="book-languages"><strong>Languages:</strong> {{ bookDetail?.languageId.join(', ') }}</p>
+        <p class="book-genres"><strong>Genres:</strong> {{ bookDetail?.genreId.join(', ') }}</p>
+        <p class="book-formats"><strong>Formats:</strong> {{ bookDetail?.formatId.join(', ') }}</p>
+        <p class="book-author"><strong>Author ID:</strong> {{ bookDetail?.authorId }}</p>
+        <button class="add-to-cart">ADD TO CART</button> -->
+        <div class="synopsis">
+            <h3>Synopsis</h3>
+            <p>
+                In a quiet village nestled between ancient forests, a young artist uncovers secrets hidden in the
+                whispers of the wind.
+                This tale weaves a rich tapestry of mystery, resilience, and the beauty of nature, drawing readers into
+                a world of enchantment.
+            </p>
+        </div>
+        <div class="genres">
+            <h4>GENRES:</h4>
+            <p>Fiction, Mystery</p>
+        </div>
+        <div class="reviews">
+            <h3>Customer Reviews</h3>
+            <div class="overall-reviews">
+                <span class="stars">★★★★☆</span>
+                <span class="rating-value">4.5</span>
+                <span class="review-count">12 Reviews</span>
+            </div>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header" data-target="all-reviews">
+                        <span>All Customer Reviews</span>
+                        <svg aria-hidden="true" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5 5 1 1 5" />
+                        </svg>
+                    </div>
+                    <div id="all-reviews" class="accordion-content reviews-content">
+                        <div class="review-item">
+                            <div class="reviewer-name">Priya M.</div>
+                            <div class="review-meta">
+                                <span class="stars">★★★★★</span>
+                                <span>Reviewed on May 5, 2025</span>
+                            </div>
+                            <p>
+                                This book completely changed my perspective on death. Sadhguru's explanations are clear,
+                                profound, and surprisingly comforting. A must-read for anyone seeking to understand
+                                life’s deeper questions.
+                            </p>
+                        </div>
+                        <div class="review-item">
+                            <div class="reviewer-name">Rohan S.</div>
+                            <div class="review-meta">
+                                <span class="stars">★★★★☆</span>
+                                <span>Reviewed on April 20, 2025</span>
+                            </div>
+                            <p>
+                                Sadhguru blends spirituality with practical insights in a way that’s easy to grasp. Some
+                                parts were a bit dense, but overall, it’s a thought-provoking read that I’d recommend.
+                            </p>
+                        </div>
+                        <div class="review-item">
+                            <div class="reviewer-name">Anjali K.</div>
+                            <div class="review-meta">
+                                <span class="stars">★★★★★</span>
+                                <span>Reviewed on March 15, 2025</span>
+                            </div>
+                            <p>
+                                This book is a treasure for anyone on a spiritual journey. Sadhguru’s wisdom shines
+                                through, offering clarity and peace about a topic many avoid. Highly recommended!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header" data-target="write-review">
+                        <span>Write a Review</span>
+                        <svg aria-hidden="true" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5 5 1 1 5" />
+                        </svg>
+                    </div>
+                    <div id="write-review" class="accordion-content">
+                        <form class="review-form" action="/submit-review" method="POST">
+                            <div>
+                                <label for="reviewer-name">Your Name</label>
+                                <input type="text" id="reviewer-name" name="reviewer-name" required
+                                    placeholder="Enter your name">
+                            </div>
+                            <div>
+                                <label for="rating">Rating</label>
+                                <select id="rating" name="rating" required>
+                                    <option value="" disabled selected>Select a rating</option>
+                                    <option value="5">★★★★★ (5 Stars)</option>
+                                    <option value="4">★★★★☆ (4 Stars)</option>
+                                    <option value="3">★★★☆☆ (3 Stars)</option>
+                                    <option value="2">★★☆☆☆ (2 Stars)</option>
+                                    <option value="1">★☆☆☆☆ (1 Star)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="review-text">Your Review</label>
+                                <textarea id="review-text" name="review-text" required
+                                    placeholder="Write your review here"></textarea>
+                            </div>
+                            <button type="submit">Submit Review</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

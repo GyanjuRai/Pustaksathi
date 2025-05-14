@@ -1,0 +1,254 @@
+<header>
+    <div class="container">
+        <nav>
+            <div class="logo">PustakSathi</div>
+            <div class="nav-links">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#catalog">Catalog</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <div class="nav-buttons">
+                    <a routerLink="/login" class="btn-nav btn-login">Login</a>
+                    <a routerLink="/register" class="btn-nav btn-signup">Sign Up</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<section class="hero">
+    <section id="real-time-updates" class="real-time-updates">
+        <div class="container">
+            <h2 class="section-title">Real-Time Updates</h2>
+            <div class="messages-container">
+                <div *ngFor="let message of messages" class="message-card">
+                    <p>{{ message }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="container hero-content">
+        <div class="hero-text">
+            <h1><span id="slogan"></span></h1>
+            <p>Explore thousands of titles across genres. Enjoy personalized recommendations and fast delivery right to
+                your doorstep.</p>
+            <a href="#catalog" class="btn-primary">Browse Catalog</a>
+        </div>
+        <div class="hero-image">
+            <img src="assets/images/6920933.jpg" alt="Stack of books">
+        </div>
+    </div>
+</section>
+
+
+<section class="hero">
+    <div class="hero-slider">
+        <div class="slider-items">
+            <div class="slider-item active">
+                <div class="slider-content">
+                    <div class="slider-image">
+                        <img src="assets/images/6920933.jpg" alt="Book 1">
+                    </div>
+                    <div class="slider-info">
+                        <h3>Noticing</h3>
+                        <p>A captivating tale of self-discovery and resilience by Shortee.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="slider-item">
+                <div class="slider-content">
+                    <div class="slider-image">
+                        <img src="assets/fantasy-style-scene-international-day-education.jpg" alt="Book 2">
+                    </div>
+                    <div class="slider-info">
+                        <h3>Poafatters</h3>
+                        <p>An intriguing mystery that keeps you guessing by Ambutees.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="slider-item">
+                <div class="slider-content">
+                    <div class="slider-image">
+                        <img src="assets/death-an-inside-story-by-sadguru.jpeg" alt="Book 3">
+                    </div>
+                    <div class="slider-info">
+                        <h3>Confirms</h3>
+                        <p>A thrilling adventure through unknown lands by Ambutees.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slider-nav">
+            <i class="fas fa-chevron-left" onclick="prevSlide()"></i>
+            <i class="fas fa-chevron-right" onclick="nextSlide()"></i>
+        </div>
+        <div class="slider-dots">
+            <span class="dot active" onclick="currentSlide(0)"></span>
+            <span class="dot" onclick="currentSlide(1)"></span>
+            <span class="dot" onclick="currentSlide(2)"></span>
+        </div>
+    </div>
+</section>
+
+<section id="features" class="features">
+    <div class="container">
+        <h2 class="section-title">Why Choose Us</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <img src="assets/images/6920933.jpg" alt="Wide Selection">
+                <h3>Wide Selection</h3>
+                <p>From bestsellers to rare finds, our extensive catalog has something for every reader.</p>
+            </div>
+            <div class="feature-card">
+                <img src="assets/images/6920933.jpg" alt="Personalized Picks">
+                <h3>Personalized Picks</h3>
+                <p>Our smart recommendations help you discover books tailored to your tastes.</p>
+            </div>
+            <div class="feature-card">
+                <img src="assets/images/6920933.jpg" alt="Secure Checkout">
+                <h3>Secure Checkout</h3>
+                <p>Fast, safe, and easy checkout process with multiple payment options.</p>
+            </div>
+            <div class="feature-card">
+                <img src="assets/images/6920933.jpg" alt="Express Delivery">
+                <h3>Express Delivery</h3>
+                <p>Get your books delivered quickly, with free shipping on orders over $50.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="best-sellers">
+    <div class="container">
+        <h2 class="section-title">Best Selling Books</h2>
+        <div class="cards-grid">
+            <div class="book-card" onclick="window.location.href='book-description.html?book=The Silent Patient'">
+                <img src="assets/images/death-an-inside-story-by-sadguru.jpeg" alt="The Silent Patient"
+                    class="book-cover">
+                <div class="book-info">
+                    <h4>Death-an-inside-story</h4>
+                    <p>Sadhguru</p>
+                </div>
+            </div>
+            <div class="book-card" onclick="window.location.href='book-description.html?book=Where the Crawdads Sing'">
+                <img src="assets/images/fantasy-style-scene-international-day-education.jpg"
+                    alt="Where the Crawdads Sing" class="book-cover">
+                <div class="book-info">
+                    <h4>Where the Crawdads Sing</h4>
+                    <p>Delia Owens</p>
+                </div>
+            </div>
+            <div class="book-card" onclick="window.location.href='book-description.html?book=Where the Crawdads Sing'">
+                <img src="assets/images/fantasy-style-scene-international-day-education.jpg"
+                    alt="Where the Crawdads Sing" class="book-cover">
+                <div class="book-info">
+                    <h4>Where the Crawdads Sing</h4>
+                    <p>Delia Owens</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="genres">
+    <div class="container">
+        <h2 class="section-title">Explore Genres</h2>
+        <div class="genres-grid">
+            <div class="genre-card">
+                <img src="assets/images/6920933.jpg" alt="Fiction">
+                <h5>Fiction</h5>
+            </div>
+            <div class="genre-card">
+                <img src="assets/images/Untitled.jpg" alt="Non-Fiction">
+                <h5>Non-Fiction</h5>
+            </div>
+            <div class="genre-card">
+                <img src="assets/images/1689018773-91fqdoW5QzL.avif" alt="Mystery">
+                <h5>Mystery</h5>
+            </div>
+            <div class="genre-card">
+                <img src="assets/images/images.jpg" alt="Sci-Fi">
+                <h5>Sci-Fi</h5>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        © 2025 Book Haven. All rights reserved.
+    </div>
+</footer>
+
+
+<script>
+    const slogans = [
+        "Discover Your Next Favorite Book",
+        "Unleash Your Reading Adventure",
+        "Find Stories That Inspire You",
+        "Dive Into a World of Books",
+        "Your Perfect Read Awaits"
+    ];
+    let currentSloganIndex = 0;
+    const sloganElement = document.getElementById('slogan');
+
+    function displaySlogan() {
+        const slogan = slogans[currentSloganIndex];
+        const words = slogan.split(' ');
+        sloganElement.innerHTML = '';
+
+        words.forEach((word, index) => {
+            const span = document.createElement('span');
+            span.className = 'word';
+            span.textContent = word + ' ';
+            span.style.animationDelay = `${index * 0.1}s`;
+            sloganElement.appendChild(span);
+        });
+
+        currentSloganIndex = (currentSloganIndex + 1) % slogans.length;
+        setTimeout(displaySlogan, 3000);
+    }
+
+    displaySlogan();
+</script>
+
+<script>
+    let slideIndex = 0;
+    const slides = document.querySelectorAll('.slider-item');
+    const dots = document.querySelectorAll('.dot');
+
+    function showSlides() {
+        slides.forEach((slide, index) => {
+            slide.classList.remove('active');
+            dots[index].classList.remove('active');
+        });
+        slideIndex = (slideIndex + 1) % slides.length;
+        slides[slideIndex].classList.add('active');
+        dots[slideIndex].classList.add('active');
+    }
+
+    function currentSlide(index) {
+        slideIndex = index;
+        slides.forEach((slide, i) => {
+            slide.classList.remove('active');
+            dots[i].classList.remove('active');
+        });
+        slides[slideIndex].classList.add('active');
+        dots[slideIndex].classList.add('active');
+    }
+
+    function nextSlide() {
+        slideIndex = (slideIndex + 1) % slides.length;
+        showSlides();
+    }
+
+    function prevSlide() {
+        slideIndex = (slideIndex - 1 + slides.length) % slides.length;
+        showSlides();
+    }
+
+    setInterval(showSlides, 5000);
+    showSlides();
+</script>

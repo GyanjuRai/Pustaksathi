@@ -2,6 +2,7 @@ export interface BooksDetails  {
     bookId: number;
     title: string;
     description: string;
+    bookImage: string;
     ISBN: string;
     price: number;
     inStock: number;

@@ -23,6 +23,6 @@ export class AccountService
     }
 
     getUserInfo(param?: object, showLoader = false): Observable<ResponseModel<userInfoResponse>> {
-        return this.api.get("Account/GetUserInfo", param, false, showLoader);
+        return this.api.get("Account/UserInfoSel", param, false, showLoader);
     }
 }
